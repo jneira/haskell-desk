@@ -1,4 +1,4 @@
-module sandbox where
+module Sandbox where
 -- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
 -- http://people.cs.uu.nl/jeroen/-}
 
