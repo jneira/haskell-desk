@@ -74,22 +74,19 @@ diag str=putStrLn $ reduce 0 str
    que hay verticalmente. Tenga en cuenta que una cadena de caracteres es en realidad 
    una lista de caracteres -}
 
-cuadrado str= putStrLn.concat $ replicate (length str) 
-              $ str ++ "\n"
+cuadrado str= putStrLn.unlines $ replicate (length str) str 
 
 {- Ejercicio 1.4
    Escriba una funcion dividir, de manera que dada una lista de caracteres de como 
-   resultado otra lista, pero ahora  dividida en l�neas. Cada vez que haya dos 
+   resultado otra lista, pero ahora  dividida en lineas. Cada vez que haya dos 
    caracteres seguidos que sean iguales se insertar en el resultado una
    nueva linea (entre los dos caracteres iguales) -}
 
-dividir ""= putStrLn ""
-dividir (h:t)=putStrLn (concat (reverse (foldl acc [h:"\n"] t)))
-		where acc ((h:ht):t) ch | h==ch =(ch:h:ht):t 
-					| otherwise= (ch:"\n"):(h:ht):t
-
-dividir2 str=putStrLn $ concatMap (\x->x ++ "\n") $ group str
-
+dividir lst=let line x (h:t) |x==h=x:'\n':h:t
+                             |otherwise=x:h:t
+                f (h:t)=foldr line [last (h:t)] $ init (h:t)
+                f []=[]    
+            in putStrLn $ f lst      
 
 -- Ejercicio 3.1
 --aproxseno :: (Num a) => a -> a -> a
