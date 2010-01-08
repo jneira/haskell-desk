@@ -1,9 +1,8 @@
-<<<<<<< HEAD:sandbox.hs
-{- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
-   http://people.cs.uu.nl/jeroen/-}
+module sandbox where
+-- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
+-- http://people.cs.uu.nl/jeroen/-}
 
-=======
->>>>>>> ecffb5d6298f3c0ba26bb7a7daeb60d2e8046c95:sandbox.hs
+
 import Data.List as List 
 import Data.Array as Array
 import Control.Monad.Writer
