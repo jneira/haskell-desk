@@ -1,6 +1,9 @@
+<<<<<<< HEAD:sandbox.hs
 {- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
    http://people.cs.uu.nl/jeroen/-}
 
+=======
+>>>>>>> ecffb5d6298f3c0ba26bb7a7daeb60d2e8046c95:sandbox.hs
 import Data.List as List 
 import Data.Array as Array
 import Control.Monad.Writer
@@ -77,7 +80,7 @@ cuadrado str= putStrLn.concat $ replicate (length str)
 
 {- Ejercicio 1.4
    Escriba una funcion dividir, de manera que dada una lista de caracteres de como 
-   resultado otra lista, pero ahora  dividida en líneas. Cada vez que haya dos 
+   resultado otra lista, pero ahora  dividida en lï¿½neas. Cada vez que haya dos 
    caracteres seguidos que sean iguales se insertar en el resultado una
    nueva linea (entre los dos caracteres iguales) -}
 
