@@ -1,3 +1,5 @@
+{- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
+   http://people.cs.uu.nl/jeroen/-}
 
 import Data.List as List 
 import Data.Array as Array
@@ -8,9 +10,7 @@ fac n = product [1..n]
 comb n k = fac n / (fac k * fac (n-k))
 n !^! k=comb n k 
 
-formulaWhere a b c = [ (-b+d)/n
-		     , (-b-d)/n
-		     ]
+formulaWhere a b c = [(-b+d)/n, (-b-d)/n ]
 		     where d= sqrt (b*b-4.0*a*c)
 			   n= 2.0*a
 facrec n |n==0 = 1
@@ -46,19 +46,15 @@ lpad :: Int -> Char -> [Char] -> [Char]
 lpad 0 c cad = cad
 lpad n c cad = lpad (n-1) c (c:cad)
  
-mkArray :: (Ix a) => (a -> b) -> (a,a) -> Array a b
-mkArray f bnds = array bnds [(i, f i) | i <- range bnds]
-squares= mkArray (\i -> i * i) (1,100)
-
 {- Ejercicio 1.1. 
    Escriba una funcion que cuente cuantos numeros negativos existen en una lista.-}
 
 countNeg0 xs = foldl (\x y -> if y<0 then x+1 else x) 0  xs
 countNeg1 xs=sum [1 | x <- xs,x<0]
-
 countNeg2  [] =  0
 countNeg2  (h:t) | h < 0 = 1 + countNeg2 t
                  | otherwise  = countNeg2 t
+
 {- Ejercicio 1.2
    Escriba una funcion diag que tenga una lista de caracteres como parametro 
    y que de como resultado los caracteres
