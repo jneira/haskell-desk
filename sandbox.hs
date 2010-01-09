@@ -88,9 +88,16 @@ dividir lst=let line x (h:t) |x==h=x:'\n':h:t
                 f []=[]    
             in putStrLn $ f lst      
 
--- Ejercicio 3.1
---aproxseno :: (Num a) => a -> a -> a
-
+{- Ejercicio 3.1
+   Escriba una funcion aproxseno que, dados dos numeros eps y x 
+   (el primero mayor que 0, el segundo cualquiera),
+   de como resultado el numero y con la propiedad de que
+   | sin x - y | < eps
+   Use la siguiente regla matematica: 
+   (-1)^n * x ^(2*n+1) /(fromIntegral $ fac (2*n+1))
+   Escriba dos veces una definici´on para aproxseno: 
+   una vez usando la funcion iterate y otra con until.
+-}
 aproxseno x eps = head $ until (\(y:_)-> abs (sin x-y) < eps) 
                         (\(fst:snd:tail) -> fst+snd:tail)
                         $ termsTaylor x                               
@@ -103,7 +110,7 @@ aproxseno2 x eps= head $ dropWhile (\y-> abs (sin x-y) >= eps)
                                   $ termsTaylor x
 
 {- Ejercicio 3.4
-Â¿Que funcion f y que lista a cumplen la siguiente regla?
+¿Que funcion f y que lista a cumplen la siguiente regla?
 map (+1) . reverse = foldl f a -}
 assert 3.4 f lst=(map (+ 1).reverse $ lst)
                   == (f lst)
@@ -147,6 +154,14 @@ ndedc lista = let  norepe [] n=[n]
                    norepe (x:xs) n | x == n    = x:xs
                                     | otherwise = n:x:xs
               in length $ foldl norepe [] lista 
+
+{-Ejercicio 3.8
+Escriba una funcion nded (numero de elementos distintos), que, dada una lista cualquiera de numeros, devuelva
+cuantos numeros distintos existen en la lista.
+Una posibilidad de resolver este problema es contar solamente la primera ocurrencia de cada numero en la lista.
+-}
+
+
            
 -- Useful tips
 infix 8 $>
