@@ -95,7 +95,7 @@ dividir lst=let line x (h:t) |x==h=x:'\n':h:t
    | sin x - y | < eps
    Use la siguiente regla matematica: 
    (-1)^n * x ^(2*n+1) /(fromIntegral $ fac (2*n+1))
-   Escriba dos veces una definici´on para aproxseno: 
+   Escriba dos veces una definiciï¿½on para aproxseno: 
    una vez usando la funcion iterate y otra con until.
 -}
 aproxseno x eps = head $ until (\(y:_)-> abs (sin x-y) < eps) 
@@ -110,7 +110,7 @@ aproxseno2 x eps= head $ dropWhile (\y-> abs (sin x-y) >= eps)
                                   $ termsTaylor x
 
 {- Ejercicio 3.4
-¿Que funcion f y que lista a cumplen la siguiente regla?
+ï¿½Que funcion f y que lista a cumplen la siguiente regla?
 map (+1) . reverse = foldl f a -}
 assert 3.4 f lst=(map (+ 1).reverse $ lst)
                   == (f lst)
