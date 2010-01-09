@@ -160,8 +160,9 @@ Escriba una funcion nded (numero de elementos distintos), que, dada una lista cu
 cuantos numeros distintos existen en la lista.
 Una posibilidad de resolver este problema es contar solamente la primera ocurrencia de cada numero en la lista.
 -}
-
-
+nded :: (Eq a)=>[a]->Int
+nded = length.nub 
+nded2 lst = undefined
            
 -- Useful tips
 infix 8 $>
