@@ -95,7 +95,7 @@ dividir lst=let line x (h:t) |x==h=x:'\n':h:t
    | sin x - y | < eps
    Use la siguiente regla matematica: 
    (-1)^n * x ^(2*n+1) /(fromIntegral $ fac (2*n+1))
-   Escriba dos veces una definici�on para aproxseno: 
+   Escriba dos veces una definiciï¿½on para aproxseno: 
    una vez usando la funcion iterate y otra con until.
 -}
 aproxseno x eps = head $ until (\(y:_)-> abs (sin x-y) < eps) 
@@ -110,7 +110,7 @@ aproxseno2 x eps= head $ dropWhile (\y-> abs (sin x-y) >= eps)
                                   $ termsTaylor x
 
 {- Ejercicio 3.4
-�Que funcion f y que lista a cumplen la siguiente regla?
+ï¿½Que funcion f y que lista a cumplen la siguiente regla?
 map (+1) . reverse = foldl f a -}
 assert 3.4 f lst=(map (+ 1).reverse $ lst)
                   == (f lst)
@@ -150,10 +150,10 @@ Escriba una funcion ndedc (numero de elementos distintos creciente), que dada un
 decida cuantos numeros distintos hay en la lista.
 Use el dato de que la lista esta ordenada.-}
 ndedc:: (Eq a) => [a] -> Int
-ndedc lista = let  norepe [] n=[n]
-                   norepe (x:xs) n | x == n    = x:xs
-                                    | otherwise = n:x:xs
-              in length $ foldl norepe [] lista 
+ndedc lista = let  norep [] n=[n]
+                   norep (x:xs) n | x == n    = x:xs
+                                  | otherwise = n:x:xs
+              in length $ foldl norep [] lista 
 
 {-Ejercicio 3.8
 Escriba una funcion nded (numero de elementos distintos), que, dada una lista cualquiera de numeros, devuelva
@@ -162,8 +162,55 @@ Una posibilidad de resolver este problema es contar solamente la primera ocurren
 -}
 nded :: (Eq a)=>[a]->Int
 nded = length.nub 
-nded2 lst = undefined
-           
+nded2::(Eq a)=>[a]->Int
+nded2 = let cont (x,xs) y | elem y xs = (x,xs)
+                          | otherwise = (x+1,y:xs) 
+        in fst .(foldl cont (0,[])) 
+
+{-Ejercicio 3.9
+Escriba una funcion segmento, que, dados una lista xs y dos numeros i y j, devuelva una sublista de xs desde el
+indice i+1 hasta el indice j.
+No se puede usar el operador !!.
+Antes de contestar esta pregunta, se debe especificar que pasa si j <= i, j > #xs y si i > #s.-}
+
+segmento2 i j lst 
+         | j > (length lst)=segmento i (length lst) lst
+         | i>=j = segmento j i lst
+         | otherwise= let acc (c,xs) x | c>=i && c<=j = (c+1,xs++[x])
+                                       | otherwise = (c+1,xs)
+                      in snd $ foldl acc (0,[]) lst    
+
+segmento:: Int -> Int ->  [a] -> [a]
+segmento i j lista | i >= j = segmento2 j i lista
+                    | i < 0=segmento2  0 j lista
+                    | j > l=segmento2  i l lista
+                    | otherwise=take (j-i) (drop i lista)
+                    where l=length lista
+
+{-Ejercicio 3.10
+Escriba una funcion esSegmento, que, dadas dos listas xs y ys devuelva True si xs es segmento de ys, 
+y False si no.
+Una lista xs es sublista de ys cuando ys = hs ++ xs ++ ts, con hs, ts listas de cero o mas elementos.
+Se puede usar la funcion segmento del ejercicio anterior.-}
+esSegmento xs ys 
+           | length xs > length ys = False
+           | h1==h2 && xs == take (length xs) ys = True 
+           | otherwise = esSegmento xs t2
+           where (h1:_,h2:t2)=(xs,ys)
+
+esSegmento2 xs ys | length xs > (length ys)   = False
+                  | xs == take (length xs) ys = True
+                  | otherwise                 = esSegmento2 xs (tail ys)
+
+{-Ejercicio 3.11
+Escriba una funcion scdosa (sigue concatenando los dos anteriores), que, dadas dos listas xs y ys 
+del mismo tipo, devuelva una lista infinita de listas, con las siguientes propiedades:
+• Los primeros dos elementos son respectivamente xs y ys.
+• Para cada n > 0 el n+2-esimo elemento es la concatenacion del n-esimo elemento con el n+1-esimo elemento.
+Use la funcion iterate.-}
+ 
+scdosa xs ys =map last $  iterate (\lst-> lst++[last lst++(last.init $ lst)]) [xs,ys]
+               
 -- Useful tips
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
