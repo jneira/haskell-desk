@@ -95,7 +95,7 @@ dividir lst=let line x (h:t) |x==h=x:'\n':h:t
    | sin x - y | < eps
    Use la siguiente regla matematica: 
    (-1)^n * x ^(2*n+1) /(fromIntegral $ fac (2*n+1))
-   Escriba dos veces una definiciï¿½on para aproxseno: 
+   Escriba dos veces una definiciÃÂ¯ÃÂ¿ÃÂ½on para aproxseno: 
    una vez usando la funcion iterate y otra con until.
 -}
 aproxseno x eps = head $ until (\(y:_)-> abs (sin x-y) < eps) 
@@ -110,7 +110,7 @@ aproxseno2 x eps= head $ dropWhile (\y-> abs (sin x-y) >= eps)
                                   $ termsTaylor x
 
 {- Ejercicio 3.4
-ï¿½Que funcion f y que lista a cumplen la siguiente regla?
+Â¿Que funcion f y que lista a cumplen la siguiente regla?
 map (+1) . reverse = foldl f a -}
 assert 3.4 f lst=(map (+ 1).reverse $ lst)
                   == (f lst)
@@ -205,12 +205,83 @@ esSegmento2 xs ys | length xs > (length ys)   = False
 {-Ejercicio 3.11
 Escriba una funcion scdosa (sigue concatenando los dos anteriores), que, dadas dos listas xs y ys 
 del mismo tipo, devuelva una lista infinita de listas, con las siguientes propiedades:
-• Los primeros dos elementos son respectivamente xs y ys.
-• Para cada n > 0 el n+2-esimo elemento es la concatenacion del n-esimo elemento con el n+1-esimo elemento.
+*Los primeros dos elementos son respectivamente xs y ys.
+*Para cada n > 0 el n+2-esimo elemento es la concatenacion del n-esimo elemento con el n+1-esimo elemento.
 Use la funcion iterate.-}
  
-scdosa xs ys =map last $  iterate (\lst-> lst++[last lst++(last.init $ lst)]) [xs,ys]
-               
+scdosa xs ys =xs:(map last $  iterate  (\lst -> lst++[(last.init $ lst) ++ (last lst)]) [xs,ys])
+-- La buena
+acdosa2 xs ys = map fst $ iterate (\(xs,ys)->(ys,xs++ys)) (xs, ys)
+
+{-Ejercicio 3.12
+Escriba una funcion sssp (sigue sumando el segmento previo), que, dada una lista finita de numeros ns con un
+tamaño k > 0, devuelva una lista infinita ms que cumpla con las siguientes propiedades:
+* ns = take k ms
+* Para todo n >=  k : ms!!(n+1) = (sum . drop (n-k) . take n) ms
+Por ejemplo:
+sssp [0,0,1] = [0,0,1,1,2,4,7,13,24,44..
+Use la funcion iterate.-}
+sssp lst = let k=length lst
+               f xs=let n=length xs
+                    in xs++[(sum.drop(n-k).take n) xs] 
+           in init lst ++ (map last $ iterate f lst)
+
+sssp2:: [Int] -> [Int]
+sssp2 xs = xs ++ map fst ( iterate f (sum xs, xs) )
+          where f (suma, y:ys) = (sum zs, zs) where zs = ys ++ [suma]
+
+-- La buena 
+sssp3 ns = map head (iterate f ns)
+  where f ns = (tail ns) ++ [sum ns] 
+
+{-Ejercicio 3.13
+Escriba una funcion elimDobles, que, dada una lista (que puede ser infinita), devuelva una nueva lista, con solamente
+una ocurrencia de cada elemento de la lista original. El problema en este ejercicio es que la lista puede ser infinita.
+Por eso, no puede usar las funciones foldr y foldl.-}
+
+elimDobles []=[]
+elimDobles (x:xs) = x:(elimDobles (filter (/=x) xs))
+
+{-Ejercicio 3.14
+Un valor x se denomina extremo interno con indice i en la lista xs, si i es un indice con las siguientes propiedades:
+• 1 < i < length xs
+• xs!!i = x
+• existen una j y una k , con j < i y k > i con xs!!j /= x y xs!!k /= x
+• la mayor j (j < i) y la menor k (k > i) con xs!!j /= x y xs!!k /= x cumplen con la condicion que
+o xs!!j > x y xs!!k > x
+o xs!!j < x y xs!!k < x
+Dos extremos internos con indices i y j en una lista son vecinos si no existe otro extremo con indice k y i < k < j
+o j < k < i.
+Escriba una funcion extremos, que calcule los extremos internos de una lista.
+Use la funcion foldl.-}
+-- La mia
+extremos [h]= []
+extremos [h,t]=[]
+extremos (h:t)= 
+         let f (acc,p) x 
+               | x>p && (head acc)>p ||  
+                 x<p && (head acc)<p=(p:acc,x)
+               | otherwise= (acc,x)
+         in init.fst $ foldl f ([h],h) t
+
+extremos1 [h]= []
+extremos1 [h,t]=[]
+extremos1 (h:t)=let f (acc,p) x = (acc++e,x) 
+                     where e | x>p && (last acc)>p ||  
+                               x<p && (last acc)<p=[p]
+                             | otherwise=[]
+               in tail.fst $ foldl f ([h],h) t
+--Otra
+extremos2:: [Int] -> [Int]
+extremos2 lista = fst (foldl f ([], []) lista)
+                 where f ([], []) n     = ([], [n])
+                       f (extremos, (y:ys)) n | ys == [] && y == n =(extremos, (y:ys ))
+                                              | ys == [] && y /= n =(extremos, (y:[n]))
+                                              | head ys == n =(extremos, (y:ys))
+                                              | (y < head ys)==((head ys) < n)=(extremos, y:[n])
+                                              | otherwise =(extremos ++ [head ys], (head ys):[n])
+
+-- [1,1,2,3,1,1,0,1,1]
 -- Useful tips
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
