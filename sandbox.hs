@@ -255,6 +255,7 @@ o j < k < i.
 Escriba una funcion extremos, que calcule los extremos internos de una lista.
 Use la funcion foldl.-}
 -- La mia
+
 extremos [h]= []
 extremos [h,t]=[]
 extremos (h:t)= 
@@ -281,7 +282,39 @@ extremos2 lista = fst (foldl f ([], []) lista)
                                               | (y < head ys)==((head ys) < n)=(extremos, y:[n])
                                               | otherwise =(extremos ++ [head ys], (head ys):[n])
 
--- [1,1,2,3,1,1,0,1,1]
+{-Ejercicio 3.15
+Escriba una funcion distanciaExtr que calcule la maxima distancia entre dos extremos vecinos. (Ver el ejercicio
+3.14 para la definicion de extremos.) Si no existen dos extremos vecinos en la lista, entonces el resultado sera 0.-}
+distanciaExtr (h:t)= 
+         let f ((i,max),(acc,p)) x 
+                | x>p && (head acc)>p ||  
+                  x<p && (head acc)<p=((0,max'),(p:acc,x))
+                | otherwise= ((i',max),(acc,x))
+               where i'=i+1
+                     max' | max<0=0 | i'>max=i'  
+                          |otherwise=max
+         in  snd.fst $ foldl f ((0,-1),([h],h)) t
+
+-- Entendi mal no es la distancia segun el indice del extremo sino la diferencia entre valores:
+distanciaExtr2:: [Int] -> Int
+distanciaExtr2 lista = maxDif (extremos lista)
+
+-- Maxima diferencia absoluta entre dos elementos consecutivos
+maxDif:: [Int] -> Int
+maxDif (x:xs) | length (x:xs) < 2=0
+              | otherwise=fst ( foldl f (0, x) xs )
+                 where f (a, b) n=( max (abs(b-n))a, n )
+
+{-Ejercicio 3.16
+Escriba una funcion recursiva sc (sublistas crecientes), que, dada una lista, devuelva una lista de listas que existan
+en todas las sublistas no decrecientes de la lista. Escriba tambien una definicion de sc usando foldr.
+Por ejemplo:
+? sc [6,1,4,8] = [[],[6],[1],[1,4],[4],
+[1,4,8],[4,8],[1,8],[6,8],[8]]-}
+sc2 xs (h':t') | (last xs)<=h' = xs ++ (sc2 xs++[h'] t') 
+               | otherwise=xs
+sc2 xs []=xs
+sc2 [] (h:t)=sc2 [h] t
 -- Useful tips
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
