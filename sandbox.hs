@@ -311,10 +311,40 @@ en todas las sublistas no decrecientes de la lista. Escriba tambien una definici
 Por ejemplo:
 ? sc [6,1,4,8] = [[],[6],[1],[1,4],[4],
 [1,4,8],[4,8],[1,8],[6,8],[8]]-}
-sc2 xs (h':t') | (last xs)<=h' = xs ++ (sc2 xs++[h'] t') 
-               | otherwise=xs
-sc2 xs []=xs
-sc2 [] (h:t)=sc2 [h] t
+
+sc lista = combinacion lista
+           where combinacion     [] = []
+                 combinacion (x:xs) = combinacion xs 
+                                      ++ (combina x $ combinacion xs) 
+
+combina elemento []     = [[elemento]]
+combina elemento (x:xs) | x == [] = combina elemento xs
+                        | elemento <=head x=(elemento:x):(combina elemento xs )
+                        | otherwise=combina elemento xs  
+
+--Solución con foldr
+sc2:: [Int] -> [[Int]]
+sc2 lista = foldr f [] lista
+            where f elemento xs = xs ++ (combina elemento xs)
+
+--solucion mia no correcta..solo consecutivos
+x <=: (h:t)| x<=h = x:(h:t)
+           | otherwise=(h:t)
+x <=: []=[x]
+combs [] = [[]]
+combs (x:xs) = [[]] ++ map (x<=:) (combs xs)
+sc3 :: (Ord a) => [a] -> [[a]]
+sc3=nub.(concatMap combs).subs
+{-Ejercicio 3.17
+Escriba una funcion dividir, que, dados una lista no decreciente xs y un elemento x, devuelva una tupla de dos
+listas (ys,zs), con xs = ys ++ zs, donde todos los elementos de ys sean menores o iguales que x, y todos los
+elementos de zs sean mayores que x.
+Escriba una funcion insertar, que, dados una lista no decreciente ys y un elemento y, devuelva una lista no
+decreciente igual a ys mas el elemento y insertado en el lugar correspondiente.
+dividir :: a -> [a] -> ([a],[a])-}
+dividir x xs=let acc (xs,(h:t))=
+             in
+
 -- Useful tips
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
