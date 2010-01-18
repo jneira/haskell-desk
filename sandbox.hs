@@ -244,10 +244,10 @@ elimDobles (x:xs) = x:(elimDobles (filter (/=x) xs))
 
 {-Ejercicio 3.14
 Un valor x se denomina extremo interno con indice i en la lista xs, si i es un indice con las siguientes propiedades:
-• 1 < i < length xs
-• xs!!i = x
-• existen una j y una k , con j < i y k > i con xs!!j /= x y xs!!k /= x
-• la mayor j (j < i) y la menor k (k > i) con xs!!j /= x y xs!!k /= x cumplen con la condicion que
+1 < i < length xs
+xs!!i = x
+existen una j y una k , con j < i y k > i con xs!!j /= x y xs!!k /= x
+la mayor j (j < i) y la menor k (k > i) con xs!!j /= x y xs!!k /= x cumplen con la condicion que
 o xs!!j > x y xs!!k > x
 o xs!!j < x y xs!!k < x
 Dos extremos internos con indices i y j en una lista son vecinos si no existe otro extremo con indice k y i < k < j
@@ -334,7 +334,8 @@ x <=: []=[x]
 combs [] = [[]]
 combs (x:xs) = [[]] ++ map (x<=:) (combs xs)
 sc3 :: (Ord a) => [a] -> [[a]]
-sc3=nub.(concatMap combs).subs
+sc3=undefined --nub.(concatMap combs).subs
+
 {-Ejercicio 3.17
 Escriba una funcion dividir, que, dados una lista no decreciente xs y un elemento x, devuelva una tupla de dos
 listas (ys,zs), con xs = ys ++ zs, donde todos los elementos de ys sean menores o iguales que x, y todos los
@@ -342,8 +343,8 @@ elementos de zs sean mayores que x.
 Escriba una funcion insertar, que, dados una lista no decreciente ys y un elemento y, devuelva una lista no
 decreciente igual a ys mas el elemento y insertado en el lugar correspondiente.
 dividir :: a -> [a] -> ([a],[a])-}
-dividir x xs=let acc (xs,(h:t))=
-             in
+dividir2 x (h:t)=let acc (xs,(h:t))=(xs++[t],t) 
+                 in until (x<=head.snd) acc ([h],t)
 
 -- Useful tips
 infix 8 $>
