@@ -5,6 +5,7 @@ module Sandbox where
 
 import Data.List as List 
 import Data.Array as Array
+import Data.Char
 import Control.Monad.Writer
 
 fac n = product [1..n]
@@ -327,24 +328,39 @@ sc2:: [Int] -> [[Int]]
 sc2 lista = foldr f [] lista
             where f elemento xs = xs ++ (combina elemento xs)
 
---solucion mia no correcta..solo consecutivos
-x <=: (h:t)| x<=h = x:(h:t)
-           | otherwise=(h:t)
-x <=: []=[x]
-combs [] = [[]]
-combs (x:xs) = [[]] ++ map (x<=:) (combs xs)
-sc3 :: (Ord a) => [a] -> [[a]]
-sc3=nub.(concatMap combs).subs
+
+
 {-Ejercicio 3.17
 Escriba una funcion dividir, que, dados una lista no decreciente xs y un elemento x, devuelva una tupla de dos
 listas (ys,zs), con xs = ys ++ zs, donde todos los elementos de ys sean menores o iguales que x, y todos los
 elementos de zs sean mayores que x.
 Escriba una funcion insertar, que, dados una lista no decreciente ys y un elemento y, devuelva una lista no
-decreciente igual a ys mas el elemento y insertado en el lugar correspondiente.
-dividir :: a -> [a] -> ([a],[a])-}
-dividir x xs=let acc (xs,(h:t))=
-             in
+decreciente igual a ys mas el elemento y insertado en el lugar correspondiente. -}
+x <=: (h:t) = null t || h>x	 
+dividir2 x xs= (takeWhile (x>=) xs,dropWhile (x>=) xs)  
+dividir3 :: (Ord a)=>a -> [a] -> ([a],[a])
+dividir3 x xs=until ((x <=:).snd) (\(ys,(h:t))->(ys++[h],t)) ([],xs)
+dividir4 x xs=span (x>=) xs
+insertar x xs=let (ys,zs)=dividir2 x xs
+	      in ys++(x:zs)
 
+{-Ejercicio 3.18
+Escriba una funcion unico, que, dada una lista devuelva una lista que contenga exactamente los elementos que se
+encuentran solamente una vez en la lista dada. Por ejemplo:
+> unico "Cuales son las letras unicas en esta frase?"
+"oicf?" -}
+strt="Cuales son las letras unicas en esta frase?"
+unico str=let low=map toLower str;nuby=nub low
+	   in nuby\\(low\\nuby)
+unico1 []=[]
+unico1 ls=let low=map toLower ls
+	      f acc []=(acc,[])
+	      f acc (h:t)
+		|elem h t =(h:acc,flt)
+		|otherwise=(acc,flt)
+		where flt=filter (/= h) t     
+	  in fst.(mapAccumL f []) $ low
+unico2=concat.(filter ((== 1).length)).group.sort.(map toLower)
 -- Useful tips
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
