@@ -323,7 +323,7 @@ combina elemento (x:xs) | x == [] = combina elemento xs
                         | elemento <=head x=(elemento:x):(combina elemento xs )
                         | otherwise=combina elemento xs  
 
---Solución con foldr
+--Soluciï¿½n con foldr
 sc2:: [Int] -> [[Int]]
 sc2 lista = foldr f [] lista
             where f elemento xs = xs ++ (combina elemento xs)
