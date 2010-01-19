@@ -1,7 +1,7 @@
 ﻿module Sandbox where
 -- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
 -- http://people.cs.uu.nl/jeroen/
--- Algunas de las soluciones copiadas de ALBERTO RODRÍGUEZ CALVO-}
+-- Algunas de las soluciones copiadas de ALBERTO RODRIGUEZ CALVO-}
 
 
 import Data.List as List 
@@ -434,6 +434,74 @@ partirL pred xs=let nxt (xs,ys) x
 partirR pred xs=let nxt x (xs,ys) |pred x=(xs,x:ys)
 				  |otherwise=(x:xs,ys)
 		in foldr nxt ([],[]) xs
+
+{-Ejercicio 3.22
+Escriba las funciones sumar, multiplicar, restar y dividir para numeros complejos. Un numero complejo es de la
+forma a + bi, con a, b numeros reales, y i un numero con la propiedad: i2 = -1. Para la funcion dividirCompl
+puede ser util primero derivar una formula para 1/a+bi . Para esto, puedes calcular los valores de x e y en la ecuacion
+(a + bi)*(x + yi) = (1 + 0i).-}
+-- Mezcla de la libreria de Haskell complex y la funcion de division de Alberto
+infix  6  :+
+data  (RealFloat a) => Complex a = !a :+ !a  deriving (Eq,Read,Show)
+instance  (RealFloat  a) => Num (Complex a)  where
+    (x:+y) + (x':+y') =  (x+x') :+ (y+y')
+    (x:+y) - (x':+y') =  (x-x') :+ (y-y')
+    (x:+y) * (x':+y') =  (x*x'-y*y') :+ (x*y'+y*x')
+    abs z =  undefined
+    signum z = undefined  
+    fromInteger n = fromInteger n :+ 0
+
+dividirCompl:: Complex Float-> Complex Float-> Complex Float
+dividirCompl (x:+y) (x':+y') = (x:+y) * ((x'/div):+(-y'/div))
+                            	 where div = x'*x' + y'*y'
+
+{-Ejercicio 3.23
+En sistemas de numeracion en base k (con k un numero entero y k > 1), un numero puede ser representado por una
+lista de numeros, todos menores que k y mayores o iguales a cero.
+En el sistema de numeracion en base 10 (k = 10), la lista [9,8,4] representa el numero 984 (9*100+8*10+4*1).
+En el sistema de numeracion en base tres (k = 3), la lista [2,0,1] representa el numero 19 (2*9+0*3+1*1).
+Escriba una funcion listaAnumero, que, dados un numero k y una lista ms de numeros m (0 <= m < k), devuelva el
+numero representado por la lista en el sistema de numeracion en base 10.
+Defina la funcion en base a foldl.-}
+listaNum k xs= let f (acc,0) x =(acc+x,0)
+		   f (acc,i) x =(acc+(x*k^i),i-1)
+	       in fst $ foldl f (0,(length xs)-1) xs
+
+{-Ejercicio 3.24
+Podemos cambiar la representacion de numeros en un sistema de numeracion en base k que esta descrita en el
+ejercicio 3.23 por una representacion en que esta el numero al reves. Entonces, en este caso, el numero 984 en el
+sistema de numeracion es representado por la lista [4,8,9].
+Escriba una funcion listaAnumeroR que haga lo mismo que la funcion listaAnumero, pero ahora con la representacion al reves.
+Defina la funcion en base a foldr.-}
+
+listaNumR k xs=let f x (acc,0)=(acc+x,0)
+		   f x (acc,i)=(acc+(x*k^i),i-1)
+	       in  fst $ foldr f (0,(length xs)-1) xs	   
+
+-- Solucion mas elegante de Xavier Garcia Buils
+porKmas k m n = m*k+n
+listaAnumero k = foldl (porKmas k) 0
+listaAnumeroR k = foldr (flip $ porKmas k) 0
+
+{-Ejercicio 3.25
+Escriba una funcion multiplicar, que, dados un numero positivo menor que 10 m y una lista de numeros ns, que
+representa un numero n como esta descrito en el ejercicio 3.24, devuelva una lista que represente la multiplicacion
+n*m, tambien segun la representacion descrita en el ejercicio anterior. Puede suponer que trabajamos en un sistema
+de numeracion en base 10. Ejemplos:
+? multiplicar 3 [4,8,9]
+[2,5,9,2]
+? multiplicar 5 [9,9,9,1,4,6]
+[5,9,9,9,0,2,3]
+Una solucion podria ser: cambiar el numero representado en la lista por un numero entero y despues multiplicar.
+Esta solucion no se permite, porque, en este caso, no se pueden multiplicar numeros que sean muy grandes (la
+maquina acepta solamente numeros enteros hasta cierto limite). Por eso, debe aplicar otro sistema de multiplicar,
+por ejemplo el sistema que consiste en multiplicar numero por numero y guardar cada vez el resto. En este caso,
+trabaja con un par de valores: los numeros del resultado ya calculados y el resto de la ultima multiplicacion. Use
+foldr o foldl.-}
+
+
+
+
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
 fs $> x = map ($ x) fs
