@@ -393,17 +393,47 @@ segrec2 (h:h':t)|h>h'=[h]:next
                 where next=segrec2 $ h':t
 
 {-Ejercicio 3.20
-Escriba una funci´on recursiva esSubLista, que, dadas dos listas, devuelva True si la segunda lista es una sublista
-de la primera, y False si no. Decimos que ys es una sublista de la lista xs si existe una lista creciente de n´umeros
-positivos is, con ys = [xs!!i—i   is]. Ejemplos:
+Escriba una funcion recursiva esSubLista, que, dadas dos listas, devuelva True si la segunda lista es una sublista
+de la primera, y False si no. Decimos que ys es una sublista de la lista xs si existe una lista creciente de numeros
+positivos is, con ys = [xs!!i|i<-is]. Ejemplos:
 ? esSubLista "muchisimo" "uso"
 True
 ? esSubLista [1,4,2,5,7] [4,7]
 True
 ? esSubLista [1,4,2,5,7] [2,1]
-True 
+False 
 -- Useful tips -}
+esSubLista xs []=True
+esSubLista [] ys=False
+esSubLista (h:t) (h':t')
+		 | (h:t)==(h':t')=True
+		 | h==h'=esSubLista (h:t) t'
+		 | otherwise = esSubLista t (h':t')
 
+{-Ejercicio 3.21
+Escriba una funcion partir, que, dados un predicado p y una lista xs, devuelva una tupla de listas (ys,zs) en tal
+forma que ys contenga todos los elementos de xs, que cumplan con la condicion p, y en zs el resto de los elementos
+de xs. Por ejemplo:
+? partir digit "a1!,bc4"
+("14","a!,bc")
+Es posible escribir una definicion simple y correcta:
+partir p xs = (filter p xs, filter (not.p) xs)
+Pero, en este ejercicio queremos practicar el uso de las funciones fold. Entonces, debes dar una definicion en base
+a foldr o foldl.-}	 
+-- Esta funcion es una generalizacion del ejercicio 3.17 y se pueden trasladar las soluciones
+-- directamente poniendo el predicado como parametro
+partir=span
+partir1 pred xs= (takeWhile pred xs,dropWhile pred xs)  
+partir2 pred xs=until (pred.head.snd) (\(ys,(h:t))->(ys++[h],t)) ([],xs)
+--Pero nos la piden con foldl y/o foldr
+partirL pred xs=let nxt (xs,ys) x
+			| pred x=(xs,ys++[x])
+			| otherwise =(xs++[x],ys)
+		in foldl nxt ([],[]) xs
+
+partirR pred xs=let nxt x (xs,ys) |pred x=(xs,x:ys)
+				  |otherwise=(x:xs,ys)
+		in foldr nxt ([],[]) xs
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
 fs $> x = map ($ x) fs
