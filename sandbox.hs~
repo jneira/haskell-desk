@@ -1,4 +1,4 @@
-﻿module Sandbox where
+module Sandbox where
 -- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
 -- http://people.cs.uu.nl/jeroen/-}
 
@@ -96,7 +96,7 @@ dividir lst=let line x (h:t) |x==h=x:'\n':h:t
    | sin x - y | < eps
    Use la siguiente regla matematica: 
    (-1)^n * x ^(2*n+1) /(fromIntegral $ fac (2*n+1))
-   Escriba dos veces una definiciÃÂÃÂ¯ÃÂÃÂ¿ÃÂÃÂ½on para aproxseno: 
+   Escriba dos veces una definiciÃÂ¯ÃÂ¿ÃÂ½on para aproxseno: 
    una vez usando la funcion iterate y otra con until.
 -}
 aproxseno x eps = head $ until (\(y:_)-> abs (sin x-y) < eps) 
@@ -111,7 +111,7 @@ aproxseno2 x eps= head $ dropWhile (\y-> abs (sin x-y) >= eps)
                                   $ termsTaylor x
 
 {- Ejercicio 3.4
-ÃÂ¿Que funcion f y que lista a cumplen la siguiente regla?
+Â¿Que funcion f y que lista a cumplen la siguiente regla?
 map (+1) . reverse = foldl f a -}
 assert 3.4 f lst=(map (+ 1).reverse $ lst)
                   == (f lst)
@@ -323,7 +323,7 @@ combina elemento (x:xs) | x == [] = combina elemento xs
                         | elemento <=head x=(elemento:x):(combina elemento xs )
                         | otherwise=combina elemento xs  
 
---Solucion con foldr
+--Soluci�n con foldr
 sc2:: [Int] -> [[Int]]
 sc2 lista = foldr f [] lista
             where f elemento xs = xs ++ (combina elemento xs)
@@ -354,43 +354,13 @@ unico str=let low=map toLower str;nuby=nub low
 	   in nuby\\(low\\nuby)
 unico1 []=[]
 unico1 ls=let low=map toLower ls
-	      f acc []=acc
+	      f acc []=(acc,[])
 	      f acc (h:t)
-		|elem h t =f acc flt
-		|otherwise=f (acc++[h]) flt
+		|elem h t =(h:acc,flt)
+		|otherwise=(acc,flt)
 		where flt=filter (/= h) t     
-	  in f [] low
+	  in fst.(mapAccumL f []) $ low
 unico2=concat.(filter ((== 1).length)).group.sort.(map toLower)
-
-{-Ejercicio 3.19
-a. Escriba una funcion segcrec (segmentos crecientes), que dada una lista, devuelva una lista de listas que cumpla
-con las siguientes condiciones:
-• la concatenacion de los elementos en el resultado devuelve la lista original
-• todos los elementos del resultado son listas no decrecientes y tampoco son vacias
-• por cada segmento no decreciente ys de la lista dada, existe un elemento en el resultado del cual ys es
-un segmento
-La definicion de segcrec debe ser en base a foldl o foldr.
-b. De tambien una definicion recursiva de segcrec.
-Ejemplo:
-? segcrec [1,2,3,4,2,3,5,6,4,8,3,2]
-[[1,2,3,4],[2,3,5,6],[4,8],[3],[2]]-}
-lst 3.19=[1,2,3,4,2,3,5,6,4,8,3,2]
-segrec []=[]
-segrec (h:t)=let f lst x | x>=(last.last$lst)=(init lst)++[last lst++[x]]
-                         | otherwise=lst++[[x]] 
-             in  foldl f [[h]] t
-
-segrec1 lst=let f x []=[[x]]
-                f x (h':t') | x<(head h') = (x:h'):t'
-                            | otherwise=[x]:(h':t')
-            in foldr f [] $ lst
-
-segrec2 []=[]
-segrec2 [h]=[[h]]
-segrec2 (h:h':t)|h>h'=[h]:next
-                |otherwise=(h:(head next)):(tail next)
-                where next=segrec2 $ h':t
---3:[2]:[[]]    
 -- Useful tips
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
