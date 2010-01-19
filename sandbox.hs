@@ -1,6 +1,7 @@
 ﻿module Sandbox where
 -- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
--- http://people.cs.uu.nl/jeroen/-}
+-- http://people.cs.uu.nl/jeroen/
+-- Algunas de las soluciones copiadas de ALBERTO RODRÍGUEZ CALVO-}
 
 
 import Data.List as List 
@@ -96,7 +97,7 @@ dividir lst=let line x (h:t) |x==h=x:'\n':h:t
    | sin x - y | < eps
    Use la siguiente regla matematica: 
    (-1)^n * x ^(2*n+1) /(fromIntegral $ fac (2*n+1))
-   Escriba dos veces una definiciÃÂÃÂ¯ÃÂÃÂ¿ÃÂÃÂ½on para aproxseno: 
+   Escriba dos veces una definicion para aproxseno: 
    una vez usando la funcion iterate y otra con until.
 -}
 aproxseno x eps = head $ until (\(y:_)-> abs (sin x-y) < eps) 
@@ -111,7 +112,7 @@ aproxseno2 x eps= head $ dropWhile (\y-> abs (sin x-y) >= eps)
                                   $ termsTaylor x
 
 {- Ejercicio 3.4
-ÃÂ¿Que funcion f y que lista a cumplen la siguiente regla?
+¿Que funcion f y que lista a cumplen la siguiente regla?
 map (+1) . reverse = foldl f a -}
 assert 3.4 f lst=(map (+ 1).reverse $ lst)
                   == (f lst)
@@ -390,8 +391,19 @@ segrec2 [h]=[[h]]
 segrec2 (h:h':t)|h>h'=[h]:next
                 |otherwise=(h:(head next)):(tail next)
                 where next=segrec2 $ h':t
---3:[2]:[[]]    
--- Useful tips
+
+{-Ejercicio 3.20
+Escriba una funci´on recursiva esSubLista, que, dadas dos listas, devuelva True si la segunda lista es una sublista
+de la primera, y False si no. Decimos que ys es una sublista de la lista xs si existe una lista creciente de n´umeros
+positivos is, con ys = [xs!!i—i   is]. Ejemplos:
+? esSubLista "muchisimo" "uso"
+True
+? esSubLista [1,4,2,5,7] [4,7]
+True
+? esSubLista [1,4,2,5,7] [2,1]
+True 
+-- Useful tips -}
+
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
 fs $> x = map ($ x) fs
