@@ -354,7 +354,6 @@ unico str=let low=map toLower str;nuby=nub low
 	   in nuby\\(low\\nuby)
 unico1 []=[]
 unico1 ls=let low=map toLower ls
-	      f acc []=(acc,[])
 	      f acc (h:t)
 		|elem h t =(h:acc,flt)
 		|otherwise=(acc,flt)
