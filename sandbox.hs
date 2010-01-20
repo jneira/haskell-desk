@@ -504,10 +504,30 @@ mult x xs=let m (acc,r) y=
                 in (r':acc,d) 
           in uncurry (flip (:)) $ foldl m ([],0) xs 
            
-multR x xs=let m y (acc,r)=
-                let (d,r')=(y*x+r)%10 
-                in (r':acc,d) 
-           in uncurry (flip(:)) $ foldr m ([],0) xs
+multR2 x xs=let m y (acc,r)=
+                  let (d,r')=(y*x+r)%10 
+                  in (r':acc,d) 
+            in uncurry (flip(:)) $ foldr m ([],0) xs
+
+{-Como podemos ver de varios ejercicios hay un patron comun en varios de ellos: fold con una tupla que 
+consiste un acumulador y tarnformar una lista en otra (map) COmo para casi cada patron hay un funcion de 
+orden superior para evitar repeticiones en este caso es mapAccumR y mapAccumL. Podemos reescribir la ultima 
+de mis soluciones:-}
+
+multR x xs=uncurry (:) $ mapAccumR (\r y->(y*x+r)%10) 0 xs
+
+{-Ejercicio 3.26
+Escriba una funcion multip que haga lo mismo que la funcion multiplicar descrita en el ejercicio 3.25, pero ahora
+multiplique dos listas en la representacion especial, y no (como en el ejercicio anterior), un numero entero menor
+que 10 con una lista en la representacion especial. Por ejemplo:
+? multip [1,3] [4,8,9]
+[6,3,9,3]
+Es util usar la funcion multip y escribir una funcion sumar mas. La funcion sumar debe sumar dos numeros
+representados en listas como en los anteriores ejercicios.-}
+mas= (map (foldl1 (+))).transpose 
+multp xs ys=let acc i n=(i+1,(multR n ys)++replicate i 0)
+            in  mas $ mapAccumR acc 0 xs
+                
 
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
