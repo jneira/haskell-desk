@@ -498,9 +498,16 @@ maquina acepta solamente numeros enteros hasta cierto limite). Por eso, debe apl
 por ejemplo el sistema que consiste en multiplicar numero por numero y guardar cada vez el resto. En este caso,
 trabaja con un par de valores: los numeros del resultado ya calculados y el resto de la ultima multiplicacion. Use
 foldr o foldl.-}
-
-
-
+x % y = (div x y,mod x y)
+mult x xs=let m (acc,r) y=
+                let (d,r')=(y*x+r)%10 
+                in (r':acc,d) 
+          in uncurry (flip (:)) $ foldl m ([],0) xs 
+           
+multR x xs=let m y (acc,r)=
+                let (d,r')=(y*x+r)%10 
+                in (r':acc,d) 
+           in uncurry (flip(:)) $ foldr m ([],0) xs
 
 infix 8 $>
 --($>) :: a-> [(a->b)]  -> [b]
