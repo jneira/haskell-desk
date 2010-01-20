@@ -524,9 +524,13 @@ que 10 con una lista en la representacion especial. Por ejemplo:
 [6,3,9,3]
 Es util usar la funcion multip y escribir una funcion sumar mas. La funcion sumar debe sumar dos numeros
 representados en listas como en los anteriores ejercicios.-}
-mas= (map (foldl1 (+))).transpose 
-multp xs ys=let acc i n=(i+1,(multR n ys)++replicate i 0)
-            in  mas $ mapAccumR acc 0 xs
+
+mas= (uncurry (:)).
+     (mapAccumR (\r x->(x+r)%10) 0).
+     (map sum).transpose 
+multp xs ys=let r0 i=replicate i 0
+                acc i n=(i+1,r0(length xs-i)++(multR n ys)++r0 i)
+            in mapAccumR acc 0 xs
                 
 
 infix 8 $>
