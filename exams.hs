@@ -22,14 +22,18 @@ una lista vacia. Por ejemplo:
 -}
 reglas = [ ("DESPEDIDA",["ADIOS","NOS VEREMOS"]),
 		("HOLA",["ENCANTADO"]),("SALUDO",["HOLA","QUE TAL?"]) ]
-reescribe c r=(filter ((== c).fst)) r
+reescribe c r
+  | res==[]=[]
+  | otherwise=snd.head $ res
+  where res=(filter ((== c).fst)) r
+               
 reescribe1 sent [] = []
 reescribe1 sent ((ent,sal):resto)
 	| sent == ent = sal
 	| otherwise = reescribe1 sent resto
 reescribe2 c r= concat [s | (e,s)<-r,e==c]
 
-{-(b) (1’5 puntos) Diremos que una lista de cadenas es irreducible segun una
+{-(b) (1,5 puntos) Diremos que una lista de cadenas es irreducible segun una
 lista de reglas de reescritura r, si ninguna de sus cadenas es cadena de
 entrada para una regla de r. Se desea, pues, una funcion reescritura
 que, dada una lista de reglas de reescritura r y una lista de cadenas
@@ -38,3 +42,11 @@ las cadenas de l segun r (se valorara eficiencia). Por ejemplo:
 > reescritura reglas ["SALUDO","SOY UN PROGRAMA","DESPEDIDA"]
 ["ENCANTADO","QUE TAL?","SOY UN PROGRAMA","ADIOS","NOS VEREMOS"]-}
 
+reescritura [] r=[]
+reescritura (h:s) r 
+  | out==[]=h:reescritura s r
+  | otherwise=reescritura (out++s) r
+  where out=reescribe h r 
+                        
+test 1=reescritura ["SALUDO","SOY UN PROGRAMA","DESPEDIDA"] reglas
+                        
