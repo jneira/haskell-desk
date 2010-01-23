@@ -117,6 +117,77 @@ sig (x,y) k = (x+(k+1),y*(k+1))
 {-(b) (1 punto) Una funcion ll que calcule la lista l utilizando la funcion
 siguiente.-}
  
---ll=[sig (0,0
+aux (x,y) z= let res=sig (x,y) z
+             in (x,y): aux res (z+1)
+ll=aux (0,1) 0
 
+lll=map fst $ iterate (\(x,y)->(sig x y,y+1)) ((0,1),0)
 
+{-5. (1.5 puntos) Defina una funcion analizaMaximo que, dada una lista l de
+naturales devuelva una tupla con el maximo elemento de l y el numero de
+veces que se repite. Por ejemplo:
+> analizaMaximo [1,2,3,4,2,3,3,4,2,3,3,1]
+(4,2)-}
+
+analizaMaximo xs=
+  let a (x,y) z | x==z = (x,y+1)
+                | x<z = (z,1) 
+                | otherwise=(x,y)
+  in foldl a (0,0) xs
+     
+t4 = (4,2)==analizaMaximo [1,2,3,4,2,3,3,4,2,3,3,1]
+
+{-Convocatoria Febrero 2009 - Segunda Semana-}
+
+{-1. (1’5 puntos) El siguiente codigo es una forma basica de implementar una
+funcion que calcule el enesimo numero de fibonacci :-}
+fibonacci 0 = 1
+fibonacci 1 = 1
+fibonacci n = ( fibonacci (n-1) ) + ( fibonacci (n-2) )
+{-Sin embargo, el coste temporal de esta funcion es exponencial. Se pide
+escribir una implementacion equivalente que calcule el enesimo numero de
+fibonacci de forma eficiente.-}
+
+fib 0 = 1
+fib 1 = 1
+fib n=let a (h:h':t) _=(h+h':h:h':t)
+      in head $ foldl a [1,1] [2..n] 
+
+fib2 n = ifibonacci n 1 1
+  where ifibonacci 0 nm1 nm2 = nm2
+        ifibonacci n nm1 nm2 = ifibonacci (n-1) (nm1+nm2) nm1
+        
+{-2. (1’5 puntos) Las ternas pitagoricas son aquellas tuplas (a,b,c) que cumplen
+el teorema de pitagoras: a2 +b2 = c2. Se pide programar en HUGS, en una
+unica linea y utilizando listas por comprension una funcion que nos devuelva
+todas las ternas pitagoricas.-}
+
+pit=[(b,c,a)|a<-[1..],b<-[1..a],c<-[1..b],a^2==b^2+c^2]
+pit2 = [(x,y,z) | x <- [1..] , y <- [1..x] , z <- [1..x+y], z*z == x*x + y*y ]
+
+{-3. (1 punto) Dos funciones son equivalentes cuando a igual entrada, devuelven
+igual salida. Comprobar esto de forma automatica es, en general, semidecidible,
+aunque si restringimos el conjunto de los datos de entrada es perfectamente
+posible hacerlo. Se pide, por tanto, programar en HUGS una
+funcion equivalentes que recibe dos funciones f y g y una lista de datos l
+y comprueba si f y g son equivalentes sobre el conjunto de datos contenido
+en l.-}
+
+eqs f g l=(map f l)==(map g l)
+
+{-4. Una funcion muy util a la hora de trabajar con cadenas de caracteres es la
+funcion tr, que recibe dos listas de caracteres y una cadena y devuelve la
+cadena recibida en la que se han sustituido los caracteres presentes en la
+primera lista por los de la segunda (siempre que esten en la misma posicion).
+Por ejemplo, para intercambiar los caracteres ’a’ y ’o’ seria:
+> tr "ao" "oa" "hola mundo"
+"halo munda"
+(a) (1 punto) Se pide implementar una funcion tr generica, que realice lo
+anteriormente descrito.-}
+
+tr' x y []=[]
+tr' x y (h:t)
+  | x==h = y: tr (h:t) (h':t') y 
+  | otherwise=h:tr (h:t) (h':t') y
+              
+tr               
