@@ -190,4 +190,7 @@ tr' x y (h:t)
   | x==h = y: tr (h:t) (h':t') y 
   | otherwise=h:tr (h:t) (h':t') y
               
-tr               
+tr [] ys cad=cad             
+tr xs [] cad=cad
+--tr (h:t) (h':t') cad= 
+ --linu foldl tr' 
