@@ -139,7 +139,7 @@ t4 = (4,2)==analizaMaximo [1,2,3,4,2,3,3,4,2,3,3,1]
 
 {-Convocatoria Febrero 2009 - Segunda Semana-}
 
-{-1. (1’5 puntos) El siguiente codigo es una forma basica de implementar una
+{-1. (1â5 puntos) El siguiente codigo es una forma basica de implementar una
 funcion que calcule el enesimo numero de fibonacci :-}
 fibonacci 0 = 1
 fibonacci 1 = 1
@@ -157,7 +157,7 @@ fib2 n = ifibonacci n 1 1
   where ifibonacci 0 nm1 nm2 = nm2
         ifibonacci n nm1 nm2 = ifibonacci (n-1) (nm1+nm2) nm1
         
-{-2. (1’5 puntos) Las ternas pitagoricas son aquellas tuplas (a,b,c) que cumplen
+{-2. (1â5 puntos) Las ternas pitagoricas son aquellas tuplas (a,b,c) que cumplen
 el teorema de pitagoras: a2 +b2 = c2. Se pide programar en HUGS, en una
 unica linea y utilizando listas por comprension una funcion que nos devuelva
 todas las ternas pitagoricas.-}
@@ -179,7 +179,7 @@ eqs f g l=(map f l)==(map g l)
 funcion tr, que recibe dos listas de caracteres y una cadena y devuelve la
 cadena recibida en la que se han sustituido los caracteres presentes en la
 primera lista por los de la segunda (siempre que esten en la misma posicion).
-Por ejemplo, para intercambiar los caracteres ’a’ y ’o’ seria:
+Por ejemplo, para intercambiar los caracteres âaâ y âoâ seria:
 > tr "ao" "oa" "hola mundo"
 "halo munda"
 (a) (1 punto) Se pide implementar una funcion tr generica, que realice lo
@@ -187,7 +187,56 @@ anteriormente descrito.-}
 
 tr' x y []=[]
 tr' x y (h:t)
-  | x==h = y: tr (h:t) (h':t') y 
-  | otherwise=h:tr (h:t) (h':t') y
+  | x==h = y: tr' x y  t 
+  | otherwise=h:tr' x y  t
+
+tr [] ys cad=cad
+tr xs [] cad=cad
+tr (hx:tx) (hy:ty) cad=
+   tr tx ty (tr' hx hy cad)
               
-tr               
+tr2 xs ys cad=
+    let itr [] ys x=x
+        itr xs [] x=x
+        itr (h:t) (h':t') x 
+            | h==x = h'
+            | otherwise=itr t t' x
+    in map (itr xs ys) xs
+
+
+{-(b) (1 punto) ¿Que concepto de la programacion funcional se esta utilizando
+en la funcion anterior? Expliquelo y ponga algun otro ejemplo.
+
+Se supone que la recursividad en mi caso, patrones estructurales en fin.
+
+-}
+
+{-5. (1 punto) Dada una lista de numeros, se pide programar en HUGS una
+funcion diferencias que devuelva la lista de diferencias entre dos elementos
+consecutivos de la lista de entrada. Por ejemplo:
+> diferencias [1,4,9,16,25,36]
+[3,5,7,9,11]-}
+
+diferencias xs=
+            let itr x (0,[])=(x,[])
+                itr x (pre,acc)=(x,(pre-x):acc)
+            in snd $ foldr itr (0,[]) xs
+
+diferencias2 (h:t)=
+            let dif [] x=[]
+                dif (h:t) x=(h-x):dif t h
+            in dif t h
+
+
+t6= diferencias2 [1,4,9,16,25,36]
+
+{-6. Se pide programar en HUGS las siguientes funciones:
+(a) (0’75 puntos) Una funcion decimales que, dados dos numeros naturales
+a y b nos devuelva la lista infinita de los decimales (incluyendo
+la parte entera) de la division a/b. Por ejemplo:
+> decimales 146 7
+[20,8,5,7,1,4,2,8,5,7,1,4,2,...]-}
+
+dec a b=
+   let (d,r)=(div a b,(rem a b)*10)
+   in d:dec r b 
