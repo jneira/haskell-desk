@@ -1,6 +1,7 @@
 module Examen where
 import Data.List as List
 import Data.Numbers.Primes
+import Random
 -- EXAMEN SEPT 2009
 
 {-1. Una regla de reescritura puede ser vista como una tupla formada por una
@@ -235,8 +236,273 @@ t6= diferencias2 [1,4,9,16,25,36]
 a y b nos devuelva la lista infinita de los decimales (incluyendo
 la parte entera) de la division a/b. Por ejemplo:
 > decimales 146 7
-[20,8,5,7,1,4,2,8,5,7,1,4,2,...]-}
+[20,8,5,7,1,4,2,8,5,7,1,4,2,...]-} 
 
 dec a b=
-   let (d,r)=(div a b,(rem a b)*10)
+   let (d,r)=(div a b,(mod a b)*10)
    in d:dec r b 
+
+{-(b) (0’75 puntos) Una funcion restos que, dados dos numeros naturales
+a y b nos devuelva la lista infinita de los sucesivos restos obtenidos al
+realizar la division a/b. Por ejemplo:
+> restos 146 7
+[6,4,5,1,3,2,6,4,5,1,3,2,6,...]-}
+
+restos a b=
+  let r=mod a b
+  in r:restos (r*10) b
+     
+{-(c) (1’5 puntos) Una funcion periodo que, dados dos numeros naturales
+a y b nos devuelva el periodo de la expresion decimal a/b. Para ello
+utilice las funciones decimales y restos realizadas anteriormente.
+El periodo comienza cuando aparece por primera vez el primer resto
+repetido y termina justo antes de aparecer dicho resto por segunda
+vez. Fijandonos en los ejemplos anteriores, el primer resto repetido es
+el 6 y la longitud del periodo es, tambien, 6. Por lo tanto, el periodo
+seria:
+[20,8,5,7,1,4,2,8,5,7,1,4,2,...]
+> periodo 146 7
+[8,5,7,1,4,2]-}
+
+patron _ xs []=[]
+patron max [] (h:t)=patron max [h] t 
+patron max xs (h:t)  
+  | l>max =[]
+  | xs==next=xs 
+  | otherwise= patron max (xs++[h]) t  
+    where l=length xs
+          next=take l (h:t)
+          
+periodo a b=
+  let (hd:td)=dec a b
+      itr h (h':t') 
+        | null p=itr h' t' 
+        | otherwise=p
+          where p=patron 10 [h] (h':t')
+  in itr hd td
+      
+{-Convocatoria Febrero 2009 - Primera Semana
+
+1. Diremos que un numero es “especial” si dicho numero es igual a la suma
+de los factoriales de sus cifras. Por ejemplo, tenemos que 145 = 1!+4!+5!.
+Supongamos que tenemos ya una funcion fact que nos devuelve el factorial
+de un numero. Se pide programar (en HUGS) las siguientes funciones:
+(a) (1’5 puntos) Una funcion especial que, dado un numero natural n nos
+indica si dicho numero es, o no, especial. (Nota: Se pueden utilizar
+tantas funciones auxiliares como se consideren necesarias)-}
+
+numLista 0=[]
+numLista n=
+  let (d,r)=(div n 10,mod n 10)
+  in  numLista d++[r] 
+ 
+especial n=n==(sum $ map fact $ numLista n)
+
+especiales=filter especial [1..]
+
+{-(b) (0’5 puntos) Una funcion especiales que, dados dos numeros naturales
+a y b, nos devuelve todos los n´umeros especiales entre a y b ambos
+inclusive.
+Para resolver este apartado utilizaremos la funcion filter que nos
+filtra los elementos de una lista que cumplen una cierta condicion. En
+este caso la de ser numeros “especiales”:-}
+
+esps a b=filter especial [a..b]
+
+{-2. (1 punto) Se pide programar en HUGS una funcion aplicar, que recibe
+un numero natural n, una funcion f :: a -> a y un valor x :: a y
+devuelve el resultado de aplicar n veces la funcion f a x. Por ejemplo, si f
+x = x + 1, entonces:
+> aplicar 0 f 4
+4
+> aplicar 1 f 4
+5
+> aplicar 5 f 4
+9-}
+aplicar n f a=last.(take (n+1))$ (iterate f a)
+
+aplicar2 0 f a=a    
+aplicar2 n f a=f (aplicar2 (n-1) f a)    
+
+{-3. (1’5 puntos) El siguiente codigo es una posible forma de implementar el
+algoritmo de ordenacion Quicksort:-}
+quicksort [] = []
+quicksort (a:x) = (quicksort menores) ++ [a] ++ (quicksort mayores)
+                  where menores = filter (< a) x
+                        mayores = filter (not . (< a)) x
+{-Se pide escribir una implementacion equivalente que calcule las listas mayores
+y menores de una forma mas eficiente que el codigo aqui presentado.-}
+
+quicksort2 [] = []
+quicksort2 (a:x) = (quicksort2 menores) ++ [a] ++ (quicksort2 mayores)
+                  where (menores,mayores) = minmax a x
+minmax a xs=
+  let acc (min,may) x
+        | x<a=(x:min,may)
+        | otherwise=(min,x:may)
+  in foldl acc ([],[]) xs
+     
+rands x=take x $ randomRs (1,20) (mkStdGen 42)
+
+{-4. Las Maquinas Pila son maquinas virtuales que permiten ejecutar instrucciones
+sencillas que operan sobre una pila. Por ejemplo, para sumar dos
+numeros a y b, primero se apilaria uno, despues el otro y luego se ejecutarıa
+la instruccion Sumar, que desapilarıa los dos ultimos numeros apilados en
+la pila, los sumarıa y apilarıa el resultado nuevamente en la pila.
+Se pide programar en HUGS una sencilla maquina pila que permita ejecutar
+programas con sumas, restas, multiplicaciones y divisiones sobre numeros
+enteros. Para ello:
+(a) (1’5 puntos) Diseñe una implementacion de una pila utilizando listas.
+Implemente las operaciones basicas para trabajar con pilas utilizando
+la implementacion que ha diseñado: pilavacia, apilar, desapilar
+y cima.-}
+pilavacia=[]
+apilar h t=h:t
+desapilar []=(0,[])
+desapilar (h:t)=(h,t)
+cima (h:t)=h
+
+{-(b) (1’5 puntos) Implemente las funciones sumar, restar, multiplicar
+y dividir que dada una pila p devuelven otra pila en la que se han
+desapilado los dos ultimos elementos apilados en p y se ha apilado
+la operacion correspondiente (suma, resta, multiplicacion o division)
+entre ellos.-}
+
+eval op p=
+  let (op1,p1)=desapilar p
+      (op2,p2)=desapilar p1
+  in apilar (op op1 op2) p2
+     
+psuma p=eval (+) p
+presta p=eval (-) p
+pmult p=eval (*) p
+pdiv p=eval div p
+
+{-(c) (0’5 puntos) Defina un tipo de datos Instrucciones que contenga las
+instrucciones de la maquina pila. Dichas instrucciones deben permitir
+apilar un numero entero y realizar las cuatro operaciones basicas
+anteriormente descritas.-}
+
+data Instr=Sumar | Restar | Mult | Div | Apilar Int
+          deriving (Show)
+{-(d) (1 punto) Implemente una funcion ejecutarcodigo a la cual se le
+pase una lista de Instrucciones c y una pila p, y devuelva la pila
+resultante de ejecutar el codigo almacenado en c. Por ejemplo, si la
+lista fuese [Apilar 4,Apilar 3,Apilar 2,Sumar,Multiplicar], se
+devolveria una pila en cuya cima se encontraria el resultado de evaluar
+la expresion 4  *  (3 + 2).-}
+
+ejecutarCodigo [] p=p
+ejecutarCodigo (h:t) p=
+  let op Sumar=psuma ; op Restar=presta  
+      op Mult=pmult ; op Div=pdiv ;
+      op (Apilar x)=(apilar x) 
+  in ejecutarCodigo t (op h $ p)
+  
+test=ejecutarCodigo [Apilar 4,Apilar 3,Apilar 2,Sumar,Mult] []
+
+{-5. (1 punto) Explique el concepto de evaluacion perezosa utilizando como
+ejemplo alguna funcion de las que se pide implementar en este examen.
+
+*La eval perezosa consiste en que la evaluacion se pospone hasta que el
+resultado de la misma es necesaria. Eso posibilita crear funciones 
+que representen valores infinitos
+
+Convocatoria Septiembre 2008 - Original
+
+1. El juego del Tetris consiste en ir colocando una serie de piezas que caen en
+un tablero bidimensional, de forma que al llenar una fila esta desaparece.
+El juego termina cuando la fila superior del tablero no esta vacia. Para representar
+el tablero se puede utilizar una matriz bidimensional de naturales,
+representando cada numero el color de las piezas salvo el 0 que representar´ıa
+un espacio en blanco. Se pide programar en HUGS:
+(a) (1 punto) Una funcion nuevoTablero que, dados dos numeros enteros
+ancho y alto mayores que cero, cree un tablero vacio para jugar al
+Tetris.-}
+
+nuevoTablero x y=replicate x (replicate y 0)
+
+{-(b) (1’5 puntos) Las funciones filaLlena, filaNoLlena, filaVacia, filaNoVacia
+que dada una fila del tablero nos digan, respectivamente, si dicha
+fila esta llena, no lo esta, esta vacia o no lo esta.-}
+
+filaLlena=and.(map (/= 0))
+filaVacia=and.(map (== 0))
+filaNoLlena=not.filaLlena
+filaNoVacia=not.filaVacia
+
+{-(c) (0’5 puntos) Una funcion gameOver que, dado un tablero, nos diga si
+el juego debe o no terminar.-}
+
+gameOver=filaLlena.head
+
+{-(d) (1 punto) Una funcion numeroDeLineas que, dado un tablero, nos diga
+cuantas filas estan llenas en dicho tablero.-}
+
+numLineasLlenas tb=length $ filter (filaLlena) tb
+
+{-(e) (1’5 puntos) Una funcion cambiaTablero que, dado un tablero, nos
+devuelva otro tablero (del mismo tamaño) en el que se hayan eliminado
+las filas llenas, desplazando hacia abajo las que estuvieran por encima
+de estas.-}
+
+cambioTablero []=[]
+cambioTablero (h:t) 
+  | filaLlena h = fv:cambioTablero t 
+   | otherwise=h:cambioTablero t 
+    where fv=replicate (length h) 0
+          
+{-2. Se dice que un numero es omirp cuando se trata de un numero primo y
+ademas al invertir sus digitos tambien se obtiene un numero primo. Por
+ejemplo 31 es omirp pues 13 tambien es primo, de igual forma 1597 y 7951
+son tambien numeros omirp. Se pide programar en HUGS:
+(a) (1 punto) Una funcion invierteNumero que dado un numero natural x
+mayor que cero, devuelva el numero natural resultado de invertir los
+digitos de x.-}
+numLista2 0=[]
+numLista2 x=
+  let (d,r)=(div x 10, mod x 10)
+  in (numLista2 d)++[r]
+
+calc x y z=x*y+z  
+listaNum2 =foldl (calc 10) 0  
+
+invNum n=listaNum2 $ reverse $ numLista2 n
+
+invierteNumero x = iInvierteNumero 0 x
+  where iInvierteNumero ac 0 = ac
+        iInvierteNumero ac x = iInvierteNumero (ac*10+u) d
+          where u = mod x 10
+                d = div x 10
+                
+{-(b) (0’5 puntos) Suponiendo que tenemos una funcion primo que nos dice
+si un numero es primo, se desea una funcion omirp que dado un numero
+natural x, nos diga si dicho numero es, o no, omirp.-}
+
+omirp n=isPrime n && (isPrime $ invNum n) 
+
+{-3. Un fichero puede ser vacio o bien contener un documento de texto o una
+carpeta, la cual puede contener a su vez un numero arbitrario de ficheros.
+Se pide realizar en HUGS:
+(a) (0’5 puntos) Definir una estructura que sea capaz de representar un
+fichero.-}
+
+data Fichero=Vacio | Texto [Char] | Carpeta [Fichero]
+
+{-(b) (1’5 puntos) Las funciones numTextos y numCarpetas que devuelven,
+respectivamente, el numero de documentos de texto y el numero de
+carpetas que contiene un fichero.-}
+
+numTextos Vacio = 0
+numTextos (Texto x) = 1
+numTextos (Carpeta fics)= sum $ map numTextos fics 
+
+numCarpetas Vacio=0
+numCarpetas (Texto x)=0
+numCarpetas (Carpeta fics)=1+(sum $ map numCarpetas fics)
+
+{-(c) (1 punto) Una funcion sacaTextos que dado un fichero, nos devuelva
+otro fichero obtenido eliminando todos los documentos de texto del
+fichero de entrada.-}
+
+--sacaTextos fic=
