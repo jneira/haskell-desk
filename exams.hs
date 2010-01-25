@@ -488,7 +488,7 @@ Se pide realizar en HUGS:
 fichero.-}
 
 data Fichero=Vacio | Texto [Char] | Carpeta [Fichero]
-
+                                    deriving (Show)
 {-(b) (1’5 puntos) Las funciones numTextos y numCarpetas que devuelven,
 respectivamente, el numero de documentos de texto y el numero de
 carpetas que contiene un fichero.-}
@@ -505,4 +505,289 @@ numCarpetas (Carpeta fics)=1+(sum $ map numCarpetas fics)
 otro fichero obtenido eliminando todos los documentos de texto del
 fichero de entrada.-}
 
---sacaTextos fic=
+sacaTextos (Texto x)=Vacio
+sacaTextos (Carpeta fics)=Carpeta (map sacaTextos fics)
+sacaTextos fic=fic
+
+test6=sacaTextos (Carpeta [Vacio,Texto "hola",Carpeta [Texto "adios"]])
+-- >Carpeta [Vacio,Vacio,Carpeta [Vacio]]
+
+{-Convocatoria Febrero 2008 - Segunda Semana-}
+
+{-1. Queremos disponer en HUGS de un tipo de datos que permita expresar funciones
+como combinaciones de sumas, restas, productos y divisiones de polinomios.
+Para ello:
+(a) (1 punto) Defina el tipo de datos Funcion que permita expresar una
+funcion como combinacion de sumas, restas, productos o divisiones
+de polinomios con coeficientes reales (para representar un polinomio
+utilice una lista de numeros reales que contenga sus coeficientes).-}
+
+data OperP=SumaP|RestaP|ProdP|DivP deriving (Show)
+data Funcion= Polinomio [Float] | Funcion OperP (Funcion) (Funcion)
+                                  deriving (Show)
+
+{-(b) (1’5 puntos) Diseñe una funcion evalua que, dada f de tipo Funcion
+y un numero real x, evalue f en x.-}
+
+evalua (Funcion SumaP f g) x= (evalua f x) + (evalua g x) 
+evalua (Funcion RestaP f g) x= (evalua f x) - (evalua g x) 
+evalua (Funcion ProdP f g) x= (evalua f x) * (evalua g x) 
+evalua (Funcion DivP f g) x= (evalua f x) / (evalua g x) 
+evalua (Polinomio []) x=0
+evalua (Polinomio (h:t)) x=h+ x * evalua (Polinomio t) x 
+
+{-(c) (1’5 puntos) Diseñe una funcion derivada que, dada f de tipo Funcion,
+devuelva la funcion derivada de f como un dato de tipo Funcion.
+Recuerde que:
+(f + g)' = f' + g' 
+(f − g)' = f' − g' 
+(f * g)' = f' * g + f * g'
+(f / g)' = (f'*g+f*g')/g2 
+(k * x^n)' = n * k * x^(n−1) -}
+
+derivada (Funcion SumaP f g)=Funcion SumaP (derivada f) (derivada g)
+derivada (Funcion RestaP f g)=Funcion RestaP (derivada f) (derivada g)
+derivada (Funcion ProdP f g)=Funcion SumaP (Funcion ProdP (derivada f) g)
+                             (Funcion ProdP f (derivada g))
+derivada (Funcion DivP f g)=
+  Funcion DivP 
+  (Funcion SumaP 
+   (Funcion ProdP (derivada f) g)
+   (Funcion ProdP f (derivada g)))
+  (Funcion ProdP g g)
+derivada (Polinomio xs)= Polinomio ( derivadaPol xs 0 [])
+
+
+derivadaPol [] _ d
+  | d == [] = [0]
+  | deriv == [] = [0]
+  | otherwise = deriv
+    where deriv = tail d
+derivadaPol (x:xs) g d = derivadaPol xs (g+1) (d++[x*g])
+
+{-2. Se desea una funcion en HUGS que, dada una lista l nos devuelva una de las
+siguientes cadena de caracteres que describa correctamente a l :
+• “La lista no tiene elementos”
+• “La lista tiene un unico elemento”
+• “La lista tiene mas de un elemento”
+
+(a) (1 punto) Diseñe una funcion que realice eficientemente este cometido.-}
+ 
+mensaje []="La lista no tiene elementos"
+mensaje [a]="La lista tiene un unico elemento"
+mensaje xs="La lista tiene mas de un elemento"
+
+{-(b) (0’5 puntos) Para realizar eficientemente este calculo, ¿que concepto
+propio de la programacion funcional estamos aprovechando? Explique
+en que consiste dicho concepto comparando la funcion del apartado
+anterior con otra funcion que realice el mismo calculo de forma poco
+eficiente.
+
+La evaluacion segun patrones estructurales de los datos en lugar de sus valores
+En este caso aprovechando la estructura de defincion de una lista
+Evaluacion perezosa ya que no se evalua mas que la parte de la
+lista necesaria.
+
+3. Realice las siguientes funciones en HUGS en una unica linea de codigo:
+(a) (0’5 puntos) Una funcion aListas que, dada una lista de naturales,
+devuelva otra lista en la que cada elemento sea una lista que contenga
+tantas listas vacias como indique el elemento correspondiente de la
+lista de entrada. Por ejemplo:
+> aLista [0,1,2,3]
+[[],[[]],[[],[]],[[],[],[]]]-}
+
+aLista=map (flip replicate$ [])
+
+{-(b) (0’5 puntos) Una funcion aNaturales que realice el proceso inverso al
+realizado por aListas.-}
+
+aNaturales=map length 
+
+{-(c) (0’5 puntos) Una funcion que, dada una lista l como las producidas
+por la funcion aListas, realice el mismo calculo que:-}
+
+calc1 l=foldr (+) 0 (aNaturales l)
+calc2 l=foldl (+) 0 (aNaturales l)
+
+calc3 l=length ( concat l )
+
+{-4. Un punto en un espacio n-dimensional se puede representar como una lista
+de n numeros reales con las coordenadas de dicho punto respecto de un
+sistema de referencia dado. Se pide programar las siguientes funciones en
+HUGS:
+(a) (0’5 puntos) Una funcion igualdimension que, dadas dos listas, nos
+diga si ambas tienen la misma longitud. Para realizar esta funcion no
+debera utilizarse la funcion predefinida length ni programar
+otra que realice su funcion. -}
+
+igualdim [] []=True
+igualdim [] ys=False
+igualdim xs []=False
+igualdim (h:t) (h':t')=igualdim t t'
+
+{-(b) (1 punto) Una funcion distancia que, dados dos puntos en un espacio
+n-dimensional, calcule la distancia euclidea (por ejemplo, en dimension
+2, la distancia entre [2,1] y [3,4] es la raiz cuadrada de (2−3)^2+(1−4)^2)
+entre dichos puntos. Esta funcion debera devolver -1 en el caso de que
+los puntos no pertenezcan al mismo espacio (es decir, que la longitud
+de ambas listas sea diferente).-}
+
+distancia xs ys
+  | (igualdim xs ys)=sum $ map (\[x,y]->(x-y)^2) (transpose [xs,ys])
+  | otherwise=(-1)                                 
+              
+distancia2 [] []=0
+distancia2 xs []=(-1)              
+distancia2 [] ys=(-1)
+distancia2 (h:t) (h':t')=((h-h')^2)+distancia2 t t'
+  
+{-(c) (1’5 puntos) Una funcion longitud que, dada una lista de puntos en
+un espacio n-dimensional, calcule la longitud del camino que forman,
+como suma de las distancias entre dos puntos consecutivos. Si alguno
+de los puntos no estuviera en el mismo espacio que los demas (alguna
+lista es de diferente longitud), esta funcion debera devolver -1.-}
+long []=0
+long (h:t)=
+  let r (acc,p) p'
+        | (igualdim p p' && acc>=0)=(acc+distancia p p',p')
+        | otherwise= (acc,p)
+  in fst $ foldl r (0,h) t 
+     
+long1 []=0
+long1 [a]=0
+long1 (p:p':t)  
+  | (d>=0) && (l>=0) =d+l
+  | otherwise=(-1)
+    where d= distancia p p'
+          l=long1 t
+          
+{-Convocatoria Febrero 2008 - Primera Semana-}
+
+{-1. Supongamos tener una funcion mayor (que define un orden parcial) que
+dados dos elementos x e y de tipo a nos dice si x es mayor que y. Nuestro
+objetivo es, dada una lista de elementos de tipo a, obtener dicha lista
+ordenada segun el orden definido por la funcion mayor, de forma que si se
+cumple que mayor x y, entonces y debe preceder a x en la lista resultado.
+Se pide programar en HUGS las siguientes funciones:
+(a) (1’5 puntos) Una funcion inserta que, dada una funcion mayor, un elemento
+x de tipo a y una lista l de elementos del mismo tipo (ordenada
+segun el orden establecido por la funcion mayor), inserte ordenadamente
+x en l, siguiendo el orden que establece la funcion mayor.-}
+
+inserta _ x []=[x]
+inserta mayor x (h:t)
+  | mayor x h=h:(inserta mayor x t)
+  | otherwise=x:h:t
+
+{-(b) (1’5 puntos) Una funcion ordena que, dada una funcion mayor y una
+lista l de elementos, devuelva la lista l ordenada segun el orden establecido
+por la funcion mayor. Utilice, para ello, la funcion inserta
+del apartado anterior-}
+
+ordena mayor []=[]
+ordena mayor xs=ordena' mayor [] xs
+
+ordena' mayor xs []=xs
+ordena' mayor xs (h:t)=ordena' mayor (inserta mayor h xs) t
+
+{-2. (1’5 puntos) ¿Que conceptos propios de la programacion funcional ilustran
+las funciones del ejercicio anterior? Expliquelo tomando como ejemplos las
+funciones inserta y ordena.
+
+funciones de orden superior
+Definicion de funciones con patrones
+El patr´on subrayado
+Uso de listas-}
+
+{-3. Se dice que dos numeros son amigos si la suma de los divisores propios (todos
+sus divisores salvo el mismo) del primero es igual al segundo y viceversa.
+Por ejemplo:
+• los divisores propios de 220 son 1, 2, 4, 5, 10, 11, 20, 22, 44, 55 y 110, que
+suman 284
+• los divisores propios de 284 son 1, 2, 4, 71 y 142, que suman 220
+Se pide programar las siguientes funciones en HUGS, cada una en una
+´unica linea de codigo:
+(a) (0’5 puntos) Una funcion suma que sume los elementos de una lista
+de numeros.-}
+  
+sumaN xs=foldl1 (+) xs
+ 
+{-(b) (0’5 puntos) Una funcion divisores que genere la lista de los divisores
+propios de un numero.-}
+
+divs n=filter (\x->(mod n x)==0) [1..(div n 2)] 
+divs2 n=[x | x<-[1..(div n 2)],(mod n x)== 0]
+
+{-(c) (0’5 puntos) Una funcion amigos que dados dos numeros nos diga si
+son numeros amigos.-}
+
+amigos x y=(sumaN $ divs x) == y &&
+           (sumaN $ divs y) == x
+           
+{-4. (1 punto) Realice una funcion esFactorial (en HUGS) que dado un numero
+natural, nos diga si es, o no, el factorial de otro numero y, en caso de serlo,
+nos devuelva dicho numero.-}
+
+esFactorial f x 
+  | factorial x==f=f
+  | otherwise=(-1)
+
+factorial 0=1
+factorial 1=1
+factorial x=x*(factorial (x-1))
+
+iesFactorial n c fc
+  | n == fc = (True,c)
+  | n < fc = (False,0)
+  | otherwise = iesFactorial n (c+1) (fc*(c+1))
+                
+esFactorial2 n = iesFactorial n 1 1
+
+{-5. (1 punto) La programacion funcional pura nos permite escribir un programa
+sin que importe el orden en el que se definen las funciones. Sin embargo,
+en algunas ocasiones el orden de escritura si resulta importante. Ilustre con
+un ejemplo como podria variar la evaluacion de una funcion si cambiasemos
+el orden de escritura de su definicion.
+
+Una funcion que genere numeros aleatorios sera diferente en un orden u otro
+
+6. Las Maquinas de Turing y otros modelos computacionales utilizan estructuras
+de datos denominadas cintas, que consisten en secuencias de valores
+arbitrariamente largas. Para acceder a estas cintas existe un puntero que
+indica en que posicion de la cinta se encuentra el siguiente dato a leer o
+escribir.
+(a) (0’5 puntos) Defina un tipo de datos Cinta que permita almacenar,
+de forma eficiente, una cinta de datos y el puntero de la misma.-}
+data Cinta a = Cinta [a] [a] deriving (Show)
+
+{-(b) (1 punto) Implemente dos funciones avanza y retrocede que dada una
+cinta c devuelvan una cinta en las que el puntero se haya movido al
+siguiente dato y al anterior respectivamente.-}
+
+avanza (Cinta [a] [])=Cinta [a] []
+avanza (Cinta [a] [hp:tp])=Cinta [hp:a] [tp]
+
+retrocede (Cinta [] [p])=Cinta [] [p]
+retrocede (Cinta [ha:ta] [p])=Cinta [ta] [ha:p]
+
+{-(c) (0’5 puntos) Implemente una funcion nuevoDato que dada una cinta c
+y un dato d, devuelva otra cinta igual a c salvo que el dato apuntado
+por el puntero haya sido substituido por d.
+S-}
+
+nuevoDato (Cinta [a] [p]) d=Cinta [a] [d:p]
+
+{-Convocatoria Septiembre 2007 - Original
+
+1. (1’5 puntos) La especificacion de una funcion se compone de:
+• Precondicion: predicado que define las condiciones que deben cumplir
+los datos de entrada
+• Postcondicion: predicado que define la relacion entre los datos de entrada
+y los datos de salida
+Se desea una funcion test en HUGS que, dada una funcion, su especificacion
+y un dato de entrada para dicha funcion, nos diga si la funcion, para ese
+dato de entrada, cumple con su especificacion.-}
+
+testf f (pre,post) d=not.pre d || (post d $ f d)
+
+
