@@ -788,6 +788,98 @@ Se desea una funcion test en HUGS que, dada una funcion, su especificacion
 y un dato de entrada para dicha funcion, nos diga si la funcion, para ese
 dato de entrada, cumple con su especificacion.-}
 
-testf f (pre,post) d=not.pre d || (post d $ f d)
+testf f (pre,post) d=not.pre $ d || (post d $ f d)
 
+{-2. (1’5 puntos) Se desea una funcion quitaPareja en HUGS que, dados dos
+elementos a y b y una lista xs, devuelva la lista resultante de eliminar de
+xs toda aparicion consecutiva (y en el mismo orden) de los elementos a y
+b. Por ejemplo:
+> quitaPareja 12 10 [1,2,10,12,10,20,12,10,10,12]
+[1,2,10,20,10,12]-}
 
+quitaPareja a b []=[]
+quitaPareja a b [c]=[c]
+quitaPareja a b (h:h':t)
+  | a==h && b==h' =quitaPareja a b t  
+  | otherwise=h:quitaPareja a b (h':t)
+              
+t5=quitaPareja 12 10 [1,2,10,12,10,20,12,10,10,12]==[1,2,10,20,10,12]
+
+{-3. Se desea una funcion en HUGS que, dado un numero natural, obtenga su
+descomposicion segun unos factores determinados. Para ello:
+(a) (1 punto) Programe una funcion factor que, dado un numero n y un
+factor x, devuelva una tupla formada por el numero de veces que x
+divide a n y el resultado de dividir n por x elevado a dicho numero.
+Por ejemplo:
+> factor 3 162
+(4,2)
+Ya que 162 = 2*3^4.-}
+
+factor a n=
+  let nxt (x,y)=(x+1,div y a)
+  in until (\(x,y)->(mod y a)/=0) nxt (0,n) 
+
+factor2 :: (Num a, Integral b) => (b,b) -> (a,b)
+factor2 (x,n) = ifactor x (0,n)
+  where ifactor x (e,n)
+          | rem n x == 0 = ifactor x (e+1,div n x)
+          | otherwise = (e,n)
+
+q3a (x,n) = x > 0 && n > 0
+r3a (x,n) (p,r) = x^p*r == n
+
+{-(b) (1 punto) Utilizando la funcion factor del apartado anterior, programe
+una funcion factoriza que, dado un numero y una lista infinita de
+factores, devuelva una lista conteniendo la factorizacion del numero
+segun los factores de la lista. Por ejemplo, si listaPrimos devuelve
+la lista infinita de los numeros primos, entonces:
+> factoriza 327675 listaPrimos
+[(3,1),(5,2),(17,1),(257,1)]
+Ya que 327675 = 3^1* 5^2* 17^1* 257^1.-}
+
+factoriza x (h:t) 
+  | x==1 = []
+  | exp==0 = factoriza x t
+  | otherwise=(h,exp):factoriza r t
+    where (exp,r)= factor h x   
+
+{-4. (1’5 puntos) Se desea una funcion que dada una lista xs y un predicado
+p sobre los elementos de dicha lista, devuelva una tupla formada por dos
+listas: la de aquellos elementos que cumplen p y la de los que no lo cumplen.
+Por ejemplo, si esPrimo es una funcion que nos dice si un numero es, o no,
+primo, entonces:
+> separa [1..10] esPrimo
+([2,3,5,7],[1,4,6,8,9,10])
+No debe usar ninguna funcion predefinida en HUGS para resolver
+el ejercicio. Se valorara la eficiencia de la funcion obtenida.-}
+
+separa [] pred=([],[])
+separa xs pred=
+  let aux (fs,ts) []=(fs,ts)
+      aux (fs,ts) (h:t)
+        | pred h=aux (h:fs,ts) t
+        | otherwise=aux (fs,h:ts) t
+  in aux ([],[]) xs 
+     
+{-5. La sucesion de Farey de orden n es la sucesion creciente de todas 
+las fracciones irreducibles con valores entre 0 y 1 que tienen un denominador
+menor o igual a n. Para calcular la sucesion de Farey de orden n + 1
+partimos de la sucesion de orden n y añadimos entre cada dos elementos
+consecutivos una nueva fraccion cuyo numerador y denominador sean, respectivamente,
+la suma de los numeradores y la suma de los denominadores
+de dichos elementos, siempre que el nuevo denominador sea menor o igual
+a n.
+Por ejemplo, representando las fracciones como una tupla (numerador, denominador),
+las sucesiones de Farey de orden 1, 2, 3 y 4 serian:
+• Orden 1: [(0,1),(1,1)] (por definicion)
+• Orden 2: [(0,1),(1,2),(1,1)]
+• Orden 3: [(0,1),(1,3),(1,2),(2,3),(1,1)]
+• Orden 4: [(0,1),(1,4),(1,3),(1,2),(2,3),(3,4),(1,1)]
+indicando en negrita aquellas fracciones que aparecen por primera vez.
+(a) (2 puntos) Programe una funcion trFarey que, dado un orden n y la
+sucesion de Farey de orden n−1, calcule la sucesion de Farey de orden
+n.-}
+trFarey [h] _=[]
+trFarey (h:h':t) n=h:(h+h'):h':trFarey t n
+  
+          
