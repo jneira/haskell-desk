@@ -2,6 +2,7 @@ module Examen where
 import Data.List as List
 import Data.Numbers.Primes
 import Random
+import Control.Arrow
 -- EXAMEN SEPT 2009
 
 {-1. Una regla de reescritura puede ser vista como una tupla formada por una
@@ -879,7 +880,59 @@ indicando en negrita aquellas fracciones que aparecen por primera vez.
 (a) (2 puntos) Programe una funcion trFarey que, dado un orden n y la
 sucesion de Farey de orden n−1, calcule la sucesion de Farey de orden
 n.-}
-trFarey [h] _=[]
-trFarey (h:h':t) n=h:(h+h'):h':trFarey t n
-  
-          
+trFarey [] _=[]
+trFarey [a] _=[a]
+trFarey ((a,b):(c,d):t) n
+  | n==0 = (a,b): r
+  | otherwise=(a,b):(x,y):r 
+    where (x,y)=(a+c,b+d)                 
+          r=trFarey ((c,d):t) (n-1)
+
+{-(b) (1’5 puntos) Programe una funcion farey que, dado un numero n,
+calcule la sucesion de Farey de orden n. Utilice, para ello, la funcion
+trFarey del apartado anterior.-}
+
+farey n=
+  let nxt (xs,x)=(trFarey xs (x+1),x+1)
+  in fst $ until ((== n).snd) nxt ([(0,1),(1,1)],1) 
+     
+{-Convocatoria Febrero 2007 - Segunda Semana
+
+1. (1’5 puntos) Un numero natural se dice polidivisible si es divisible por su
+longitud y al eliminar la cifra de las unidades volvemos a obtener un numero
+polidivisible. Por ejemplo:
+1024 sera polidivisible si es divisible por 4 (lo es) y 102 es polidivisible
+102 sera polidivisible si es divisible por 3 (lo es) y 10 es polidivisible
+10 sera polidivisible si es divisible por 2 (lo es) y 1 es polidivisible
+1 es, trivialmente, polidivisible
+Por lo tanto 10, 102 y 1024 son numeros polidivisibles
+Se desea una funcion en HUGS que, dado un numero natural n > 0 nos diga
+si n es, o no, polidivisible.-}
+
+lengthNum x=
+  let nxt (i,n)=(i+1,div n 10)
+  in fst $ until ((== 0).snd) nxt (0,x)
+lengthNum2:: Integer -> Int
+lengthNum2=length.show
+lengthNum3 n
+  | n < 10 = 1
+  | otherwise = 1 + lengthNum3 ( div n 10 )
+
+esPolidiv 1=True
+esPolidiv x=(0==(mod x $ lengthNum x)) && 
+            (esPolidiv $ div x 10) 
+            
+{-2. Los numeros expansivos se definen de la siguiente forma:
+• el primer numero expansivo es el 1
+• dado un numero expansivo, para calcular el siguiente cada vez que
+en el primero aparezcan n cifras consecutivas iguales (p.ej. 3333) se
+sustituiran por n seguido de la cifra que se repite (en el ejemplo 43).
+Asi, los primeros numeros expansivos son:
+1 -> ‘‘un uno’’: 11
+11 -> ‘‘dos unos’’: 21
+21 -> ‘‘un dos, un uno’’: 1211
+1211 -> ‘‘un uno, un dos, dos unos’’: 111221
+...
+Se pide programar en HUGS las siguientes funciones:
+(a) (1’5 puntos) Una funcion expand que, dada una lista con las cifras de
+un numero expansivo genere el siguiente.-}
