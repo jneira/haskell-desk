@@ -936,3 +936,101 @@ Asi, los primeros numeros expansivos son:
 Se pide programar en HUGS las siguientes funciones:
 (a) (1’5 puntos) Una funcion expand que, dada una lista con las cifras de
 un numero expansivo genere el siguiente.-}
+
+{-Examen Febrero 2010
+Se pide programar en HUGS las siguientes funciones que puedan dar una
+respuesta incluso si una (pero no las dos) de las listas que se les pasa como
+parámetros es una lista infinita:
+
+(a) (1 punto) Una función masCortata que, dadas dos listas a y b nos diga
+si la lista a es más corta que la lista b.-}
+
+masCorta ::[a]->[b]->Bool
+masCorta xs []=False
+masCorta [] ys=True
+masCorta (_:tx) (_:ty)=masCorta tx ty 
+
+{-(b) Utilizando la función anterior, una función masLarga que
+dadas dos listas a y b nos diga si la lista a es mas larga que la lista b-}
+masLarga ::[a]->[b]->Bool
+masLarga a b=masCorta b a
+
+{-(C) Utilizando las dos funciones anteriores, una función igualLongitud 
+que, dadas dos listas a y b nos diga si ambas listas tienen la
+misma longitud.-}
+
+igualLongitud xs ys= (not $ masCorta xs ys) && (not $ masLarga xs ys)
+
+{-d) (1 punto~ ¿Qué permite que estas funciones admitan que una de las
+listas sea infinita? Explique que sucedería si los dos argumentos de
+estas funciones fuesen listas infinitas.
+
+La evaluacion perezosa. Se quedaria en un bucle infinito
+
+Una agenda puede ser vista como una lista de tuplas (Fecha,Cita) ordenada
+de forma Creciente según las fechas, donde, a su vez, una Fecha, puede ser
+vista, como una tupla, de tres enteros que indiquen el día, mes y año de la
+fecha y una cita como una cadena de caracteres que la describe.
+
+Se pide programar en HUGS las siguientes funciones para gestionar una
+agenda:
+
+(am) (1 punto) Una función nuevaCita que dada una fecha, una Cita, y
+una agenda, inserte (de manera ordenada) una nueva Cita en nuestra
+agenda.-}
+type Agenda=[(Fecha,Cita)]
+type Fecha=(Int,Int,Int)
+type Cita=[Char]
+
+nuevaCita :: Fecha -> Cita -> Agenda -> Agenda
+nuevaCita f c []= [(f,c)]
+nuevaCita f c ((fh,ch):t) 
+  | f>fh=(fh,ch):(nuevaCita f c t) 
+  | otherwise=(f,c):(fh,ch):t
+
+-- Funcionaria si el orden es (aaaa,mm,dd)
+{-b) Una función citas que dadas dos fechas fi y ff y una
+agenda devuelva todas las Citas que haya en la agenda, que tengan
+lugar entre ambas fechas.-}
+
+citas :: Fecha -> Fecha -> Agenda -> Agenda
+citas fi ff a=filter (\(f,c)->f>=fi && f<=ff) a 
+
+{-Una matriz bidimensional se puede implementar en HUGS
+mediante una lista en la que cada elemento representa una fila
+de la matriz en forma de lista de los elementos que contiene. 
+Se desea una función columna que dada una matriz y un indice
+de columna (que se asumirá válido para la matriz), 
+devuelva una lista con los elementos de la matriz que están en
+esa Columna. Esta función deberá ser hecha mediante una lista por Com-
+prensión.-}
+
+columna:: (Eq a)=>[[a]] -> Int -> [a]
+columna1 mx i=[a|l<-mx,a<-l,a==(l!!i)] 
+columna mx i=[l!!j|l<-mx,j<-[0..(length l)],j==i] 
+
+{-4. En matemáticas. una sucesión alícuota es una sucesión en la que cada
+término es la suma de los divisores propios (todos sus divisores salvo él
+mismo) del término anterior. Se pide:
+
+(3) (1 punto) Una función siguiente tal que dado un término de una
+sucesión alícuota, Calcule el siguiente término de dicha sucesión. Por
+ejemplo:
+
+> siguiente 10
+8 (pues los divisores estrictos de 10 son 1, 2 y 5)
+> siguiente 6
+6 (pues los divisores estrictos de 6 son 1, 2 y 3)-}
+
+
+divs1 n=filter (\x->(mod n x)==0) [1..(div n 2)]
+sig1 n=sum $ divs1 n
+
+{-b) Una función alícuota tal que dado un número calcule la
+sucesión alícuota, que dicho número genera. Si algún término de la
+sucesión se repite, la sucesión es cíclica. La función deberá, detectar
+este hecho y detener el Cálculo mostrando Como último término el
+primer término repetido. Por ejemplo:-}
+
+alicuota n=until (\l->elem (last l) (init l))
+           (\l->l++[sig1 $ last l]) [n]
