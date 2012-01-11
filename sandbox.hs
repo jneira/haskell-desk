@@ -530,7 +530,7 @@ mas= (uncurry (:)).
      (map sum).transpose 
 multp xs ys=let r0 i=replicate i 0
                 acc i n=(i+1,r0(length xs-i)++(multR n ys)++r0 i)
-            in mapAccumR acc 0 xs
+            in mapAccumR acc 0 xs --mal
                 
 
 infix 8 $>
@@ -545,4 +545,3 @@ tellMe x= do
           let r=x+(read y :: Int)
           tell $ "The result is:" ++  show  r
           return r
-

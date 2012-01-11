@@ -159,7 +159,7 @@ fib2 n = ifibonacci n 1 1
   where ifibonacci 0 nm1 nm2 = nm2
         ifibonacci n nm1 nm2 = ifibonacci (n-1) (nm1+nm2) nm1
         
-{-2. (1â5 puntos) Las ternas pitagoricas son aquellas tuplas (a,b,c) que cumplen
+{-2.  Las ternas pitagoricas son aquellas tuplas (a,b,c) que cumplen
 el teorema de pitagoras: a2 +b2 = c2. Se pide programar en HUGS, en una
 unica linea y utilizando listas por comprension una funcion que nos devuelva
 todas las ternas pitagoricas.-}
@@ -1034,3 +1034,85 @@ primer término repetido. Por ejemplo:-}
 
 alicuota n=until (\l->elem (last l) (init l))
            (\l->l++[sig1 $ last l]) [n]
+           
+{-Examen Febrero 2010-}
+type MA = [[Int]]
+type LA = [[(Int,Int)]] -- ERROR
+ma=[[inf,2,inf],[3,inf,1],[3,0,inf]]::MA
+la=[[(1,2)],[(0,3),(2,1)],[(0,3),(1,0)]] :: LA
+inf=999999999 :: Int
+
+{-1.a) -}
+gradoMA :: MA -> Int -> Int
+gradoMA m x=let nodos=m!!x
+            in length $ filter (< inf) nodos --ERROR CREO
+gradoLA :: LA -> Int -> Int
+gradoLA l x = length (l!!x)          
+{-1.b) -}
+adyacentesMA :: MA -> Int -> Int -> Bool 
+adyacentesMA m x y=
+  let nodos=m!!x
+  in (nodos!!y)<inf
+adyacentesLA :: LA -> Int -> Int -> Bool
+adyacentesLA l x y=elem y (map (fst) (l!!y))
+{-1.c) -}
+listaAdyacentesMA :: MA -> Int -> [Int]
+{- listaAdyacentesMA m x=filter (< inf) (m!!x) ERROR -}
+listaAdyacentesMA m x=
+  let ns=m!!x 
+      r (acc,n) x | x<inf =(n:acc,n+1)   
+                  | otherwise =(acc,n+1)
+  in fst $ foldl r ([],0) ns
+
+listaAdyacentesLA :: LA -> Int -> [Int]
+listaAdyacentesLA l x=map (fst) $ l!!x
+{-1.d) -}
+vecinosMA :: MA -> Int -> Int -> [Int]
+vecinosMA _ 0 _=[]
+vecinosMA m max x=
+  let ads=listaAdyacentesMA m x 
+  in nub.(filter$(/= x)) $ 
+     ads ++ (concatMap (vecinosMA m (max-1)) ads) --ERROR sin concat ni nub
+vecinosLA :: LA -> Int -> Int -> [Int]
+vecinosLA _ 0 _=[]
+vecinosLA m max x=
+  let ads=listaAdyacentesLA m x 
+  in nub.(filter$(/= x)) $ 
+     ads ++ (concatMap (vecinosLA m (max-1)) ads) --ERROR sin concat ni nub
+
+{-1.e) -}
+type Camino=[Int]
+costeMA :: MA -> Camino -> Int  
+costeMA m (h:t)=
+  let iCosteMA _ [] = 0
+      iCosteMA x (h':t') 
+        | ((m!!x)!!h')==inf = inf
+        | otherwise=((m!!x)!!h')+iCosteMA h' t' 
+  in iCosteMA h t
+     
+costeLA :: LA -> Camino -> Int
+costeLA l (h:t)=
+  let iCosteLA _ []=0
+      iCosteLA x (h':t') 
+        |null next = inf
+        |otherwise =(snd $ head next)+iCosteLA h' t'
+          where next=filter ((== h).fst) $ l!!x
+  in iCosteLA h t
+     
+{-2.-}
+
+replica :: Int -> [a] -> [a]
+replica n []=[]
+replica n (h:t)=(take n $ repeat h)++(replica n t) {-Error-}
+
+{-3. Se da por supuesto que los si algun nodo es "vacio" es valido-}
+
+monticulo :: Ord a=>[a]->Bool
+monticulo []= True
+monticulo lst=let imonticulo n
+                    | length lst < n = True
+                    | (comp 1 && comp 2)=imonticulo (n+1)
+                    | otherwise=False
+                      where comp k=(length lst)<=(2*n+k)||
+                               (lst!!(2*n+k))<=lst!!n
+              in imonticulo 0
