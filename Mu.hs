@@ -11,16 +11,22 @@ Como ejemplo sencillo podemos coger el típico N = Zero | Succ N
 (https://twitter.com/#!/joseanpg/status/156123394667053056)
 --}
 data N = Zero|Succ N
+              deriving(Show)
+two=Succ(Succ Zero)
 {--
 El functor base para dicho tipo es polinomico (más fácil): F t = Zero | Succ t
 (https://twitter.com/#!/joseanpg/status/156123600645128192)
 --}
 data F t=FZero|FSucc t
+               deriving(Show)
+ftwo=FSucc(FSucc FZero)
 {--
 Es obvio que si N = Zero | Succ N entonces N = F N
 https://twitter.com/#!/joseanpg/status/156123783336443904
 --}
-newtype FN=F(FN)
+newtype FN=FN(F FN)
+           deriving(Show)
+fntwo=FN (FSucc (FN (FSucc (FN FZero))))
 {--
 Dado un functor F entonces μ F 'denotará' la solución de la ecuación X = F X, 
 es decir: μ F = F (μ F). 
@@ -33,7 +39,7 @@ Por cierto, N = F N → N = μ F.
 newtype Mu f=In (f (Mu f))
 
 newtype MuN=MuN(Mu F)
-
+muNTwo=MuN(In (FSucc (In (FSucc (In FZero)))))            
 -- from http://en.wikibooks.org/wiki/Haskell/Fix_and_recursion
 newtype Mu' f=Mu' (forall a.(f a->a)->a)
 data Nu f=forall a.Nu a (a->f a)
