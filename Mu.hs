@@ -1,5 +1,6 @@
 {-# LANGUAGE ExistentialQuantification,RankNTypes #-}
-
+-- Ver http://en.wikibooks.org/wiki/Haskell/Polymorphism
+-- sobre RankNTypes
 module Mu where
 
 {--
