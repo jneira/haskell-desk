@@ -68,3 +68,6 @@ newtype Void a=Void (Mu ((,) a)) -- forall b.((a,b)->b)->b
 
 newtype MuN=MuN (Mu F)
 --munTwo=MuN(Mu (FSucc (FSucc (FZero))))
+
+fold'' :: (f a -> a) -> ((f a->a)->a) -> a
+fold'' g f=f g
