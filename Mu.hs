@@ -37,10 +37,34 @@ Por cierto, N = F N → N = μ F.
 [ #Haskell ] newtype μ f = In ( f (μ f))
 (https://twitter.com/#!/joseanpg/status/156137618143322112)
 --}
-newtype Mu f=In (f (Mu f))
+newtype Mu' f=In (f (Mu' f))
 
-newtype MuN=MuN(Mu F)
-muNTwo=MuN(In (FSucc (In (FSucc (In FZero)))))            
+newtype MuN'=MuN'(Mu' F)
+muNTwo'=MuN'(In (FSucc (In (FSucc (In FZero)))))            
+
 -- from http://en.wikibooks.org/wiki/Haskell/Fix_and_recursion
-newtype Mu' f=Mu' (forall a.(f a->a)->a)
+newtype Mu f=Mu (forall a.(f a->a)->a)
 data Nu f=forall a.Nu a (a->f a)
+
+fold' :: (f a -> a) -> Mu f -> a
+fold' g (Mu f)=f g
+unfold' :: (a -> f a) -> a -> Nu f
+unfold' f x=Nu x f
+--refold' :: (a -> f a) -> (g a-> a) -> Mu f -> Nu g
+--refold' f g=unfold' g . fold' f
+
+newtype T=T (forall a.a->a)
+t=T (id::a->a)
+
+newtype T' f=T'(forall a.f a->a)
+t'=T'(head::[a]->a)
+
+f :: ([a]->a)->a
+f=undefined
+mu=Mu (f)
+
+newtype Stream a=Stream (Nu ((,) a)) -- forsome b. (b,b->(a,b))
+newtype Void a=Void (Mu ((,) a)) -- forall b.((a,b)->b)->b
+
+newtype MuN=MuN (Mu F)
+--munTwo=MuN(Mu (FSucc (FSucc (FZero))))
