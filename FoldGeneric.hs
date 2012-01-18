@@ -1,3 +1,6 @@
+{-# LANGUAGE ExistentialQuantification,RankNTypes #-}
+-- Ver http://en.wikibooks.org/wiki/Haskell/Polymorphism
+-- sobre RankNTypes
 module FoldGeneric where
 
 -- from http://en.wikibooks.org/wiki/Haskell/Fix_and_recursion
