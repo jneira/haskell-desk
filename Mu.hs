@@ -2,7 +2,7 @@
 -- Ver http://en.wikibooks.org/wiki/Haskell/Polymorphism
 -- sobre RankNTypes
 module Mu where
-
+import Control.Applicative
 {--
 Cada tipo inductivo regular puede considerarse solución 
 de una ecuación fix-point construida sobre un functor base
@@ -11,23 +11,24 @@ de una ecuación fix-point construida sobre un functor base
 Como ejemplo sencillo podemos coger el típico N = Zero | Succ N
 (https://twitter.com/#!/joseanpg/status/156123394667053056)
 --}
-data N = Zero|Succ N
+data Nat = Zero|Succ Nat
               deriving(Show)
 two=Succ(Succ Zero)
 {--
 El functor base para dicho tipo es polinomico (más fácil): F t = Zero | Succ t
 (https://twitter.com/#!/joseanpg/status/156123600645128192)
 --}
-data F t=FZero|FSucc t
+data FNat t=FZero|FSucc t
                deriving(Show)
-ftwo=FSucc(FSucc FZero)
+two'=FSucc(FSucc FZero)
+
 {--
 Es obvio que si N = Zero | Succ N entonces N = F N
 https://twitter.com/#!/joseanpg/status/156123783336443904
 --}
-newtype FN=FN(F FN)
+newtype Nat'=Nat'(FNat Nat')
            deriving(Show)
-fntwo=FN (FSucc (FN (FSucc (FN FZero))))
+two''=Nat' (FSucc (Nat' (FSucc (Nat' FZero))))
 {--
 Dado un functor F entonces μ F 'denotará' la solución de la ecuación X = F X, 
 es decir: μ F = F (μ F). 
@@ -37,37 +38,44 @@ Por cierto, N = F N → N = μ F.
 [ #Haskell ] newtype μ f = In ( f (μ f))
 (https://twitter.com/#!/joseanpg/status/156137618143322112)
 --}
-newtype Mu' f=In (f (Mu' f))
+newtype Mu f=In(f (Mu f))
 
-newtype MuN'=MuN'(Mu' F)
-muNTwo'=MuN'(In (FSucc (In (FSucc (In FZero)))))            
+newtype Nat''=Nat''(Mu FNat)
+two'''=Nat''(In (FSucc (In (FSucc (In FZero)))))            
 
--- from http://en.wikibooks.org/wiki/Haskell/Fix_and_recursion
-newtype Mu f=Mu (forall a.(f a->a)->a)
-data Nu f=forall a.Nu a (a->f a)
+-- from http://stackoverflow.com/questions/4434292/catamorphism-and-tree-traversing-in-haskell
 
-fold' :: (f a -> a) -> Mu f -> a
-fold' g (Mu f)=f g
-unfold' :: (a -> f a) -> a -> Nu f
-unfold' f x=Nu x f
---refold' :: (a -> f a) -> (g a-> a) -> Mu f -> Nu g
---refold' f g=unfold' g . fold' f
+data TreeNode a child
+    = Leaf a | 
+      Branch child child
+      deriving(Show)
+type IntNode = TreeNode Int      
+type IntTree = Mu IntNode
 
-newtype T=T (forall a.a->a)
-t=T (id::a->a)
+instance Functor (TreeNode a) where
+    fmap f (Leaf x) = Leaf x 
+    fmap f (Branch l r)=Branch (f l) (f r)
 
-newtype T' f=T'(forall a.f a->a)
-t'=T'(head::[a]->a)
+cata:: (Functor node)=>(node r -> r) -> Mu node -> r
+cata f (In t)=f (fmap (cata f) t)
 
-f :: ([a]->a)->a
-f=undefined
-mu=Mu (f)
 
-newtype Stream a=Stream (Nu ((,) a)) -- forsome b. (b,b->(a,b))
-newtype Void a=Void (Mu ((,) a)) -- forall b.((a,b)->b)->b
+data TreeAlgebra a r = 
+  TreeAlgebra { leaf   :: a      -> r, 
+                branch :: r -> r -> r }
+  
+foldFunction :: TreeAlgebra a r -> (TreeNode a r -> r)
+foldFunction alg (Leaf a) = leaf alg a
+foldFunction alg (Branch l r) = branch alg l r
 
-newtype MuN=MuN (Mu F)
---munTwo=MuN(Mu (FSucc (FSucc (FZero))))
+type Tree a=Mu (TreeNode a)
+treeCata:: TreeAlgebra a r -> (Tree a -> r)
+treeCata alg = cata (foldFunction alg)
 
-fold'' :: (f a -> a) -> ((f a->a)->a) -> a
-fold'' g f=f g
+tree :: IntTree 
+tree=In(Branch (In (Leaf 1)) (In (Leaf 2)))
+
+treeAlg=TreeAlgebra{leaf=id,branch=(+)}
+
+test=treeCata treeAlg tree 
+-- tes
