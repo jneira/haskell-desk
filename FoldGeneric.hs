@@ -30,5 +30,7 @@ newtype Void a=Void (Mu ((,) a)) -- forall b.((a,b)->b)->b
 -- Mu (forall a.(f a->a)->a)
 newtype MuList=MuList(Mu [])
 
+newtype Rank2OnList = MakeRank2OnList (forall a . [a]->a)
+newtype Rank2Poly f = MakeRank2Poly (forall a . f a->a)
 
-
+newtype PolyList=MkPolyList(forall a . [a])
