@@ -75,7 +75,7 @@ step' :: GraphWithDists -> MinPaths' -> Set Vertex -> MinPaths'
 step' g mps@((hp,dists),prevs) q
   | Set.size q < 2 = mps
   | otherwise = step' g mps' q' -- O(n)
-  where Just((d,u),hp') = view hp -- O(1) 
+  where Just((d,u),hp') = view hp -- O(logn) 
         q'= delete u q -- O(logn)
         mps'=foldr (updateDist' u) ((hp',dists),prevs) (g!u) -- O(n)
 
