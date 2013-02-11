@@ -7,6 +7,7 @@ import qualified Data.Set as Set (toList,fromList,fromAscList,size,insert)
 import Data.List (minimumBy)
 import Data.Ord (comparing)
 import System.Environment
+import System.Time (getClockTime, diffClockTimes) 
 
 type Vertices=DiffUArray Vertex Vertex
 type MinPaths=(Vertices,Vertices)
@@ -116,5 +117,8 @@ sol fn v w opts= do
 
 main=do
   fn:v:w:heap <- getArgs
+  t0 <- getClockTime 
   res <- sol fn (read v) (read w) heap 
+  t1 <- getClockTime 
+  putStrLn ("Time: " ++ show (diffClockTimes t1 t0)) 
   print res
