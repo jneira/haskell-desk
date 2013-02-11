@@ -2,6 +2,7 @@ module FizzBuzz where
 import Test.HUnit
 import Control.Applicative
        
+
 data FizzBuzz = ConsString String 
               | ConsInt Int
               deriving (Show,Eq)

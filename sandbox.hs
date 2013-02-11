@@ -7,6 +7,7 @@
 import Data.List as List 
 import Data.Array as Array
 import Data.Char
+import Data.Ord
 import Control.Monad.Writer
 
 fac n = product [1..n]
@@ -23,7 +24,7 @@ facrec n |n==0 = 1
 --Ejemplos de patrones en la declaracion (destructuracion en la llamada)
 
 facrec2 0 = 1
-facrec2 (n+1)=(n+1)*fac n
+--facrec2 (n+1)=(n+1)*fac n
 
 {-Es posible crear listas de funciones, si estas funciones (como numeros, valores booleanos y listas) son de un
 mismo tipo, es posible hacer listas de funciones.
@@ -545,3 +546,28 @@ tellMe x= do
           let r=x+(read y :: Int)
           tell $ "The result is:" ++  show  r
           return r
+
+arbol' n = [if c == n + q 
+           then '\n' 
+           else if c <= n - q 
+                then ' ' 
+                else '*' | 
+           q <- [1 .. n], c <- [1 .. n + q]]
+
+arbol'' n = unlines [r (n-x) ' ' ++ r (2*x-1) '*' |x<-[1..n]] 
+  where r=replicate
+
+-- Genera los INFINITOS árboles de Navidad
+bosque=a["*"] where a x=x:a (map (' ':) x ++ [replicate (1+2*length x) '*'])
+-- Para tomar un árbol concreto, basta referenciarlo por su índice
+arbol=(!!)bosque
+-- Para imprimirlo
+talar=putStrLn.unlines.arbol
+
+bosque'=iterate(\x->map(' ':)x++[replicate(1+2*length x) '*'])["*"]
+--bosque=a["*"]where a x=x:a(map(' ':)x++[take(1+2*length x)$repeat '*'])
+
+minSubsetSum'=head.sortBy(comparing length).filter(\s->s/=[] && sum s==0).subsequences 
+
+vigenere m c=zipWith f m $ cycle c
+  where f x y=chr $ (g x + g y - 130) `mod` 26 + 65;g=ord.toUpper

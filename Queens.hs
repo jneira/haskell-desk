@@ -1,7 +1,7 @@
 module Queens where
 import Data.List
 -- Based in http://www.solveet.com/exercises/Problema-de-las-ocho-reinas/50/solution-336
-mapIx f= (flip $ zipWith f) [1..]
+mapIx f= (flip $ zipWith f) [0..]
  
 unique xs=nub xs == xs
 

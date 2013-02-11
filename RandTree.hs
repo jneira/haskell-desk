@@ -17,5 +17,5 @@ generator seed=
 genTree=unfoldTree generator
 count=length.flatten
 
-main= newStdGen >>= return.count.genTree
+main= newStdGen >>= return.genTree
 
