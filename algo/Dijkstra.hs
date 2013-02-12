@@ -59,7 +59,7 @@ minPath vs v w | w == v = []
 
 type DistsHeap=MinPrioHeap Int Vertex
 
-solveWithHeap g v=solve g v
+solveWithHeap g v=solve' g v
 
 solve' :: GraphWithDists -> Vertex -> MinPaths  
 solve' g v= step' g (dists,prevs) hp
@@ -69,7 +69,7 @@ solve' g v= step' g (dists,prevs) hp
 
 step' :: GraphWithDists -> MinPaths -> DistsHeap -> MinPaths 
 step' g mps@(dists,prevs) hp
-  | size hp < 2 = mps
+  | size hp == 0 = mps
   | otherwise = step' g mps' hp'' -- O(n)
   where Just((d,u),hp') = view hp -- O(logn) 
         (hp'',mps')=foldr (updateDist' u) (hp',(dists,prevs)) (g!u) -- O(alogn)
