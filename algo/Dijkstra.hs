@@ -114,6 +114,6 @@ main=do
   fn:v:w:heap <- getArgs
   t0 <- getClockTime 
   res <- sol fn (read v) (read w) heap 
+  print res
   t1 <- getClockTime 
   putStrLn ("Time: " ++ show (diffClockTimes t1 t0)) 
-  print res
