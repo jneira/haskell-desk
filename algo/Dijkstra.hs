@@ -2,8 +2,9 @@ module Main where
 import Data.Graph
 import Data.Array.Diff
 import Data.Heap 
-import Data.Set hiding (map,toList,fromList,fromAscList,size,insert)
-import qualified Data.Set as Set (toList,fromList,fromAscList,size,insert)
+import Data.Set hiding (map,toList,fromList,fromAscList,
+                        singleton,size,insert)
+import qualified Data.Set as Set (fromList,toList,size)
 import Data.List (minimumBy)
 import Data.Ord (comparing)
 import System.Environment
@@ -56,33 +57,27 @@ minPath vs v w | w == v = []
                | otherwise = prev:minPath vs v prev  
   where prev=vs!w
 
--- With heap
 type DistsHeap=MinPrioHeap Int Vertex
-type MinPaths'=((DistsHeap,Vertices),Vertices)
 
-solveWithHeap g v=(dists,prevs)
-  where ((_,dists),prevs)=solve' g v
+solveWithHeap g v=solve g v
 
-solve' :: GraphWithDists -> Vertex -> MinPaths'  
-solve' g v= step' g ((hp,dists),prevs) q
-  where q= Set.fromList $ vertices $ fmap (map fst) g 
-        n= Set.size q 
-        allButRoot=Set.toList $ delete v q
-        hp= fromList $ (1,v):zip (repeat inf) allButRoot
+solve' :: GraphWithDists -> Vertex -> MinPaths  
+solve' g v= step' g (dists,prevs) hp
+  where n= rangeSize $ bounds g 
+        hp= singleton (1,v)
         (dists,prevs)=initMinPaths n v
 
-step' :: GraphWithDists -> MinPaths' -> Set Vertex -> MinPaths' 
-step' g mps@((hp,dists),prevs) q
-  | Set.size q < 2 = mps
-  | otherwise = step' g mps' q' -- O(n)
+step' :: GraphWithDists -> MinPaths -> DistsHeap -> MinPaths 
+step' g mps@(dists,prevs) hp
+  | size hp < 2 = mps
+  | otherwise = step' g mps' hp'' -- O(n)
   where Just((d,u),hp') = view hp -- O(logn) 
-        q'= delete u q -- O(logn)
-        mps'=foldr (updateDist' u) ((hp',dists),prevs) (g!u) -- O(n)
+        (hp'',mps')=foldr (updateDist' u) (hp',(dists,prevs)) (g!u) -- O(alogn)
 
 updateDist' :: Vertex -> (Vertex,Int) -> 
-              MinPaths' -> MinPaths' 
-updateDist' u (v,d) ds@((hp,dists),prevs)
-  | dists!v > newDist = ((hp',dists'),prevs//[(v,u)]) 
+              (DistsHeap,MinPaths) -> (DistsHeap,MinPaths) 
+updateDist' u (v,d) ds@(hp,(dists,prevs))
+  | dists!v > newDist = (hp',(dists',prevs//[(v,u)])) 
   | otherwise = ds
   where newDist=(dists!u) + d
         dists'=dists//[(v,newDist)]
