@@ -56,7 +56,7 @@ updateDist g u v ds@(dists,prevs)
   where d=g!(u,v) 
         newDist=(dists!u) + d
 
-minPath :: PrevsVertices -> Vertex -> Vertex -> [Vertex] 
+minPath :: PrevsVertices -> Vertex -> Vertex -> Path 
 minPath vs v w | w == v = []
                | prev == v = [v]
                | otherwise = prev:minPath vs v prev  
