@@ -59,7 +59,6 @@ instance Functor (TreeNode a) where
 cata:: (Functor node)=>(node r -> r) -> Mu node -> r
 cata f (In t)=f (fmap (cata f) t)
 
-
 data TreeAlgebra a r = 
   TreeAlgebra { leaf   :: a      -> r, 
                 branch :: r -> r -> r }
