@@ -1,4 +1,5 @@
-﻿module Sandbox where
+﻿{-# LANGUAGE DatatypeContexts #-}
+module Sandbox where
 -- Ejemplos y ejercicios siguiendo el libro: "Programacion Funcional" de Jeroem Fokker
 -- http://people.cs.uu.nl/jeroen/
 -- Algunas de las soluciones copiadas de ALBERTO RODRIGUEZ CALVO-}
@@ -571,3 +572,6 @@ minSubsetSum'=head.sortBy(comparing length).filter(\s->s/=[] && sum s==0).subseq
 
 vigenere m c=zipWith f m $ cycle c
   where f x y=chr $ (g x + g y - 130) `mod` 26 + 65;g=ord.toUpper
+
+f x=x+1
+g x y=(f x) + (f y) 
